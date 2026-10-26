@@ -1,0 +1,29 @@
+{
+  "name": "mi-app",
+  "directory": ".",
+  "agent": "copilot",
+  "agents": [
+    "copilot"
+  ],
+  "stack": "auto",
+  "template": "config-only",
+  "mode": "balanced",
+  "coordinator": "superpowers",
+  "testing": "balanced",
+  "autonomy": "milestones",
+  "parallel": false,
+  "design": "existing",
+  "database": "none",
+  "goal": "",
+  "skills": null,
+  "packs": [
+    "superpowers",
+    "ponytail",
+    "uiux",
+    "anthropic",
+    "addy"
+  ],
+  "vercel_react": true,
+  "vercel_web": true,
+  "vercel_composition": false
+}

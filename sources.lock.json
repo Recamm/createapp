@@ -1,0 +1,1644 @@
+{
+  "schema": 1,
+  "reviewed": "2026-10-24",
+  "sources": {
+    "obra/superpowers": {
+      "commit": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "prefixes": [
+        "skills/brainstorming",
+        "skills/writing-plans",
+        "skills/executing-plans",
+        "skills/test-driven-development",
+        "skills/systematic-debugging",
+        "skills/verification-before-completion",
+        "skills/requesting-code-review",
+        "skills/receiving-code-review",
+        "skills/finishing-a-development-branch",
+        "skills/using-git-worktrees",
+        "skills/subagent-driven-development",
+        "skills/dispatching-parallel-agents"
+      ],
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha": "abf0390320aa14406af7a520b9b0739fdda9bf08",
+          "size": 1070
+        },
+        {
+          "path": "skills/brainstorming/SKILL.md",
+          "sha": "7f5eef02f894c4f24cea313660c0465ce9c084ed",
+          "size": 13602
+        },
+        {
+          "path": "skills/brainstorming/builder-check-prompt.md",
+          "sha": "136e9c1d516ee1852abc5e556e76ce1b085d3827",
+          "size": 881
+        },
+        {
+          "path": "skills/brainstorming/scripts/frame-template.html",
+          "sha": "f540bb8a4f88107e2b37b2871a4c1a55a3b6f720",
+          "size": 8094
+        },
+        {
+          "path": "skills/brainstorming/scripts/helper.js",
+          "sha": "e11d26489ce248f37af3e4dd01ddec6a4e88287f",
+          "size": 5615
+        },
+        {
+          "path": "skills/brainstorming/scripts/server.cjs",
+          "sha": "fdc796122583f5d6687d9582eb265c2fa0cb7781",
+          "size": 25699
+        },
+        {
+          "path": "skills/brainstorming/scripts/start-server.sh",
+          "sha": "016a8e4870142ce2adbe81a021d8b6b9073e7618",
+          "size": 6908
+        },
+        {
+          "path": "skills/brainstorming/scripts/stop-server.sh",
+          "sha": "7cacfe9440043f7a46eac555cd835fad0769c425",
+          "size": 3263
+        },
+        {
+          "path": "skills/brainstorming/visual-companion.md",
+          "sha": "8dca065bd9adb9d4fa82a66acbb4176ea23259c6",
+          "size": 13413
+        },
+        {
+          "path": "skills/dispatching-parallel-agents/SKILL.md",
+          "sha": "3fa091b348bbe0a18eaa0e17e9092c97f7005cbe",
+          "size": 6078
+        },
+        {
+          "path": "skills/executing-plans/SKILL.md",
+          "sha": "ac77129d7c695734105004b6da10169de8d13df3",
+          "size": 18103
+        },
+        {
+          "path": "skills/executing-plans/scripts/task-done",
+          "sha": "e5fc6a992fb41745a4113a55a5da5cbb11ddde55",
+          "size": 1692
+        },
+        {
+          "path": "skills/executing-plans/scripts/task-start",
+          "sha": "fab75b55b2e51c0de1a1331d19c3124924380eac",
+          "size": 963
+        },
+        {
+          "path": "skills/finishing-a-development-branch/SKILL.md",
+          "sha": "fa8aecaf8813f1b19d19996f7957d1b0121f2d9c",
+          "size": 7781
+        },
+        {
+          "path": "skills/receiving-code-review/SKILL.md",
+          "sha": "950da7b74bf6dbed6b8726d12ddadd65a9f5fda7",
+          "size": 6203
+        },
+        {
+          "path": "skills/requesting-code-review/SKILL.md",
+          "sha": "68d338a58ecdd8b77bfbb519b781ef223dbbb842",
+          "size": 2974
+        },
+        {
+          "path": "skills/requesting-code-review/code-reviewer.md",
+          "sha": "6d358b5d7d450c83cacbe450b7dbd4e673b694ad",
+          "size": 6449
+        },
+        {
+          "path": "skills/subagent-driven-development/SKILL.md",
+          "sha": "ea170ed101d61a52fdee0ade8368ec0723980a5c",
+          "size": 19506
+        },
+        {
+          "path": "skills/subagent-driven-development/implementer-prompt.md",
+          "sha": "5c8ecd61fba036263bf88d0af24d47125780efa0",
+          "size": 6335
+        },
+        {
+          "path": "skills/subagent-driven-development/re-review-prompt.md",
+          "sha": "d49c1825f01e79641ba37e5e942d1d2bbaad1a3c",
+          "size": 4761
+        },
+        {
+          "path": "skills/subagent-driven-development/references/batching.md",
+          "sha": "6224e4ba255ed8359d608aaa4b8af785b6fdee70",
+          "size": 583
+        },
+        {
+          "path": "skills/subagent-driven-development/references/cannot-verify.md",
+          "sha": "e952f2d40c2646840f33f7856707f08828cbd46a",
+          "size": 513
+        },
+        {
+          "path": "skills/subagent-driven-development/references/final-review.md",
+          "sha": "851a5c5520cbb377b823229cbfdf441dcd79ac27",
+          "size": 2447
+        },
+        {
+          "path": "skills/subagent-driven-development/references/fix-loop.md",
+          "sha": "0b476e92a068af56113ff0a5c9c7ebef1afe7d2c",
+          "size": 4249
+        },
+        {
+          "path": "skills/subagent-driven-development/references/handling-reports.md",
+          "sha": "cf91cdcddde1e051bf2fc51329197af4063b9dbc",
+          "size": 1062
+        },
+        {
+          "path": "skills/subagent-driven-development/references/preflight.md",
+          "sha": "170164883949e00aace6297b600b2c5a72bc6d5a",
+          "size": 1353
+        },
+        {
+          "path": "skills/subagent-driven-development/references/resuming.md",
+          "sha": "409b826eb8c875c51dd3799add37fcaab43b69b3",
+          "size": 614
+        },
+        {
+          "path": "skills/subagent-driven-development/scripts/review-package",
+          "sha": "fa7625f053dc852200ddd497662508ff1ae40bb1",
+          "size": 2029
+        },
+        {
+          "path": "skills/subagent-driven-development/scripts/sdd-workspace",
+          "sha": "b4661eb6ef646dae804c6b7932ccdbe942520a55",
+          "size": 3684
+        },
+        {
+          "path": "skills/subagent-driven-development/scripts/task-brief",
+          "sha": "b49fc546c85e1d6f6c8b523d6c887c55d98ed989",
+          "size": 1322
+        },
+        {
+          "path": "skills/subagent-driven-development/task-reviewer-prompt.md",
+          "sha": "5c619bc510440b7bf156e78c4dfc60f198963cf0",
+          "size": 9031
+        },
+        {
+          "path": "skills/systematic-debugging/CREATION-LOG.md",
+          "sha": "9aa03092809feaf93c9bfa985252f6f1c9624692",
+          "size": 4257
+        },
+        {
+          "path": "skills/systematic-debugging/SKILL.md",
+          "sha": "62fc752aaef59a8bbed5d305f4cadc60f8ae07ed",
+          "size": 9530
+        },
+        {
+          "path": "skills/systematic-debugging/condition-based-waiting-example.ts",
+          "sha": "703a06b653160d060bbf46ab5c6e0cd7446bd592",
+          "size": 5054
+        },
+        {
+          "path": "skills/systematic-debugging/condition-based-waiting.md",
+          "sha": "70994f777c586f7d4c43033aac34c7cf0da6688b",
+          "size": 3516
+        },
+        {
+          "path": "skills/systematic-debugging/defense-in-depth.md",
+          "sha": "e2483354dc2b62478a2624e34ca18bc0efe887b2",
+          "size": 3650
+        },
+        {
+          "path": "skills/systematic-debugging/find-polluter.sh",
+          "sha": "985f5d08ccf8a3f2d40739cfcaf4413bb24bf1cb",
+          "size": 1986
+        },
+        {
+          "path": "skills/systematic-debugging/root-cause-tracing.md",
+          "sha": "0e72e8f9566b7ef85e814633d1feacad9d0c5868",
+          "size": 5321
+        },
+        {
+          "path": "skills/systematic-debugging/test-academic.md",
+          "sha": "23a6ed7a2044e0c44d74c3101406140f4851aa41",
+          "size": 653
+        },
+        {
+          "path": "skills/systematic-debugging/test-pressure-1.md",
+          "sha": "8d13b467e4a98abfffd12161cbc3c418021d6023",
+          "size": 1900
+        },
+        {
+          "path": "skills/systematic-debugging/test-pressure-2.md",
+          "sha": "2d2315ec8a24ca872bc80d2f4056468ba051462a",
+          "size": 2283
+        },
+        {
+          "path": "skills/systematic-debugging/test-pressure-3.md",
+          "sha": "89734b86fdc756488df315d53e5c3ac2d3752cd8",
+          "size": 2692
+        },
+        {
+          "path": "skills/test-driven-development/SKILL.md",
+          "sha": "46838cc9e893c06259e3bdad0fc2425b36242f15",
+          "size": 9578
+        },
+        {
+          "path": "skills/test-driven-development/writing-good-tests.md",
+          "sha": "d3c4482fd30b4f9084bb61545fe73939a7502c28",
+          "size": 8268
+        },
+        {
+          "path": "skills/using-git-worktrees/SKILL.md",
+          "sha": "1381dacb3516b94382dd6ec736ede21ee8ede2b3",
+          "size": 6813
+        },
+        {
+          "path": "skills/verification-before-completion/SKILL.md",
+          "sha": "7d45333cc4a49c57a80df6c1fe2fa777a207afbc",
+          "size": 3646
+        },
+        {
+          "path": "skills/writing-plans/SKILL.md",
+          "sha": "4cf0275d88d67aa4ef09f4bbca9970ed6ff74a00",
+          "size": 10335
+        }
+      ]
+    },
+    "DietrichGebert/ponytail": {
+      "commit": "09c434ab73ca43761c5d8b0c5d341926c2fba710",
+      "prefixes": [
+        "skills/ponytail",
+        "skills/ponytail-review",
+        "skills/ponytail-audit"
+      ],
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha": "715d483338cea4365f0d91a27799cf61226d6bcf",
+          "size": 1071
+        },
+        {
+          "path": "skills/ponytail-audit/SKILL.md",
+          "sha": "ff9a95480700600fe2664d2d0906a4d750b2da0b",
+          "size": 5417
+        },
+        {
+          "path": "skills/ponytail-review/SKILL.md",
+          "sha": "a50e3ac6ded6fccc9edae34ce37877bbce11e3fa",
+          "size": 5143
+        },
+        {
+          "path": "skills/ponytail/SKILL.md",
+          "sha": "d64edd32265ba21cbf5270158f04e97d96925f27",
+          "size": 3496
+        }
+      ]
+    },
+    "nextlevelbuilder/ui-ux-pro-max-skill": {
+      "commit": "d14efff8ed1faa4187f004f79926f428c8074ec7",
+      "prefixes": [
+        ".claude/skills/ui-ux-pro-max"
+      ],
+      "files": [
+        {
+          "path": ".claude/skills/ui-ux-pro-max/SKILL.md",
+          "sha": "41f8e2fd7f8c568228d0b55186ebe3f7b4007377",
+          "size": 15969
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/app-interface.csv",
+          "sha": "95e328c807a23be02c9c32c736d0fa19109c6076",
+          "size": 11046
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/catalog-summary.json",
+          "sha": "f911c3ae48fac5863a5a5e210866ec5cabece164",
+          "size": 2392
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/charts.csv",
+          "sha": "c6f4f875fd5b34379f24dbb541539492366a1058",
+          "size": 23365
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/colors.csv",
+          "sha": "5d2bf7389105f8a824b504b57cc93c00dc1d7e0a",
+          "size": 37940
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/data-provenance.json",
+          "sha": "e41d2e553bdc7e5a8e6d16f5daab565faf372188",
+          "size": 36686
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/google-font-licenses.json",
+          "sha": "3ac2c34e80665bc902e265c52ab6c27b1654524c",
+          "size": 433127
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/google-fonts.csv",
+          "sha": "d7f87e3e0159b1caba083b9954793d9852256aa0",
+          "size": 747241
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/icons.csv",
+          "sha": "cfc3f1eccd7e5aee15d8d70f86d8fa17ba737958",
+          "size": 57945
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/landing.csv",
+          "sha": "34858160aa2789c49dca274d48bb116d51dd3f0a",
+          "size": 25449
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/motion.csv",
+          "sha": "8e0ca9ceb0e4cd4832aee60ac74713e1e1830de8",
+          "size": 14679
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/phosphor-icons-upstream.json",
+          "sha": "ec1d76b8117ccbfdce5df214bf0d993e41a75318",
+          "size": 823933
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/products.csv",
+          "sha": "9f40f1d1f9743c4a81603076dfbfd115bbb55246",
+          "size": 75623
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/react-performance.csv",
+          "sha": "425a8e76c6b3bae40e8c633ffbf7ad6222c9f73a",
+          "size": 15080
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/angular.csv",
+          "sha": "5a1878dbee2b3c55c6468cbb18699b84d1a8c4d2",
+          "size": 19863
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/astro.csv",
+          "sha": "1fd2492420b20a0b311295ab883597fadb8245a6",
+          "size": 14591
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/avalonia.csv",
+          "sha": "c67f4117105865587eda9020c57d8c209f3a929a",
+          "size": 27327
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+          "sha": "731805c4076bd9f2755ca4bd7def5be6f6df7e9c",
+          "size": 14192
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+          "sha": "9089eb0fc821ff0c8d135f8ee503be345e8fcb84",
+          "size": 16551
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/javafx.csv",
+          "sha": "744bd80f437f12bfb5bb9c84630a58022604675a",
+          "size": 33577
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+          "sha": "8daa0b8f9a2ca3f0f1711664d9d677cd1c38dd9e",
+          "size": 12295
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/laravel.csv",
+          "sha": "ed11b0fba457e02857f996d1542fb0b8e1271756",
+          "size": 20163
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+          "sha": "acdaf097dff26ba0d3b22ab4544bf6169c87afd4",
+          "size": 18687
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+          "sha": "e2aaeca45faa8b987bf94010162b14d458811dde",
+          "size": 28700
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+          "sha": "ceab9cf3358d2788af0bd7dc14cb3fab769740d0",
+          "size": 23014
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+          "sha": "a5aea45dc1d0341b11ee42076a86db842d4d2a19",
+          "size": 14049
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/react.csv",
+          "sha": "fe8f001e695a978733449e04e99d7135af0f1bf3",
+          "size": 21166
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+          "sha": "0e8bedf3084e7a40d6310bcd3011c437efcb1700",
+          "size": 23184
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+          "sha": "51684fe70448e15333cd16207db7da8aea0508e6",
+          "size": 15078
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+          "sha": "ea9b95e8922e663b2adf27a7346e2c2f44c7a215",
+          "size": 15323
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/threejs.csv",
+          "sha": "f62286320038beabbdc5e11e07ca2818d8e959a4",
+          "size": 46769
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/uno.csv",
+          "sha": "9cab32326b4ad3a3cf43451a3c24553a41126cc1",
+          "size": 30091
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/uwp.csv",
+          "sha": "04a84ea092a7657fef11e5daa97982be52dc6f59",
+          "size": 24692
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/vue.csv",
+          "sha": "83997c515775170f22b638635aae0a67a46dfc87",
+          "size": 12813
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/winui.csv",
+          "sha": "107ecead11728a83ec0ea10d815a9d1f43a35792",
+          "size": 27890
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/stacks/wpf.csv",
+          "sha": "4e88d6750833a74f85ba487cf2b8f4ff6ebd2f4a",
+          "size": 24158
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/styles.csv",
+          "sha": "d1eb2c216e453005ffa8232ffb94491c183afe3c",
+          "size": 149478
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/typography.csv",
+          "sha": "70d107d107de30150863c965767320ec33ef29ad",
+          "size": 49997
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+          "sha": "8931d4c809f8e22ddac00ce612ce0c35f34a59b6",
+          "size": 77360
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+          "sha": "4e7d52b296537a03513b18b2c3f2b946cc802051",
+          "size": 27516
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/references/pro-rules.md",
+          "sha": "b2ce233287e37ec9ca13476c4014b922e9d5a0e9",
+          "size": 10909
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/references/quick-reference.md",
+          "sha": "7acc7e7540ca6981d878a90aae4455c1638e2385",
+          "size": 24526
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/scripts/core.py",
+          "sha": "670fe33070cfe706401da4ff276831257dbf1e25",
+          "size": 41236
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/scripts/design_system.py",
+          "sha": "d5fe1575f00d839f919603bd09b44fe7e9def4fb",
+          "size": 71537
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+          "sha": "63652a666b130c249ea1e2954316f1ac8a5a73d5",
+          "size": 5824
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/scripts/search.py",
+          "sha": "5038aa875a0d39f24dea803a4c73b38f8f56915f",
+          "size": 9373
+        },
+        {
+          "path": ".claude/skills/ui-ux-pro-max/scripts/validate_data.py",
+          "sha": "8b6c7941f6ad3e51cb9d412b11185133e7763001",
+          "size": 52230
+        },
+        {
+          "path": "LICENSE",
+          "sha": "1e71cbf26660f31903807d099fe902c098fc7e4c",
+          "size": 1075
+        }
+      ]
+    },
+    "anthropics/skills": {
+      "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "prefixes": [
+        "skills/frontend-design",
+        "skills/webapp-testing"
+      ],
+      "files": [
+        {
+          "path": "skills/frontend-design/LICENSE.txt",
+          "sha": "f433b1a53f5b830a205fd2df78e2b34974656c7b",
+          "size": 10174
+        },
+        {
+          "path": "skills/frontend-design/SKILL.md",
+          "sha": "a5333457c414d20d625f307df945842c0952ecc3",
+          "size": 9390
+        },
+        {
+          "path": "skills/webapp-testing/LICENSE.txt",
+          "sha": "4f881c52d1f72f4cfb720e339e2d35c3058d01a9",
+          "size": 11345
+        },
+        {
+          "path": "skills/webapp-testing/SKILL.md",
+          "sha": "4726215301db64a0cc4d41fc3219c61f37a30f4a",
+          "size": 3913
+        },
+        {
+          "path": "skills/webapp-testing/examples/console_logging.py",
+          "sha": "9329b5e232ed53d944bfe95e750070117d31b9ab",
+          "size": 1027
+        },
+        {
+          "path": "skills/webapp-testing/examples/element_discovery.py",
+          "sha": "917ba72f52421a1b324f93ae8e38af72010a87b9",
+          "size": 1463
+        },
+        {
+          "path": "skills/webapp-testing/examples/static_html_automation.py",
+          "sha": "90bbedcc08cdb345c74fb938ebad02c0baf56603",
+          "size": 953
+        },
+        {
+          "path": "skills/webapp-testing/scripts/with_server.py",
+          "sha": "431f2eba16b268b7f3e2ae4daae9db41c0289b6d",
+          "size": 3693
+        }
+      ]
+    },
+    "addyosmani/agent-skills": {
+      "commit": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+      "prefixes": [
+        "skills/source-driven-development",
+        "skills/security-and-hardening",
+        "skills/performance-optimization",
+        "references"
+      ],
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha": "d67778ada6b9cda6227e9130da182c13e73c8b2e",
+          "size": 1068
+        },
+        {
+          "path": "references/accessibility-checklist.md",
+          "sha": "c8c61e5f3d5a010a0d0ecb918bfaffe6c76fca78",
+          "size": 5206
+        },
+        {
+          "path": "references/definition-of-done.md",
+          "sha": "35e39f9e15f6dd0ff4725a6e5cbce7f2aa69064a",
+          "size": 3798
+        },
+        {
+          "path": "references/observability-checklist.md",
+          "sha": "ad40d7aa3fca5d2091fa45be234c14aee22c3588",
+          "size": 5129
+        },
+        {
+          "path": "references/orchestration-patterns.md",
+          "sha": "09cddd31d52a95be1d9bca814547d184b9945e44",
+          "size": 18201
+        },
+        {
+          "path": "references/performance-checklist.md",
+          "sha": "88b6f6a41be7561746c5580137a892583e5f0029",
+          "size": 13159
+        },
+        {
+          "path": "references/security-checklist.md",
+          "sha": "fc5e29b92c183fa69e0952b61a99761dc48b4c0b",
+          "size": 14360
+        },
+        {
+          "path": "references/testing-patterns.md",
+          "sha": "bc96e271ad241ca567f06d21c6ecc001455b80f1",
+          "size": 7460
+        },
+        {
+          "path": "skills/performance-optimization/SKILL.md",
+          "sha": "ff57eab055e7df4994aa9dcdcc3a6ff1d30411e0",
+          "size": 16698
+        },
+        {
+          "path": "skills/performance-optimization/references/optimization-patterns.md",
+          "sha": "63e27bcc7a051c3dc23c164f146f374e119874cc",
+          "size": 9692
+        },
+        {
+          "path": "skills/security-and-hardening/SKILL.md",
+          "sha": "e80e1e9a4f5b2989308c376d4ea0d333fe2c26ef",
+          "size": 17559
+        },
+        {
+          "path": "skills/security-and-hardening/references/hardening-patterns.md",
+          "sha": "e5fba73c9fc029444d3c099d0a51538e90ed97c2",
+          "size": 13036
+        },
+        {
+          "path": "skills/source-driven-development/SKILL.md",
+          "sha": "2704f0e130bc4659951aa552373914b2d63d18c9",
+          "size": 10038
+        }
+      ]
+    },
+    "mattpocock/skills": {
+      "commit": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
+      "prefixes": [
+        "skills/engineering/codebase-design",
+        "skills/engineering/grill-with-docs",
+        "skills/engineering/domain-modeling",
+        "skills/engineering/implement",
+        "skills/engineering/tdd",
+        "skills/engineering/code-review",
+        "skills/engineering/diagnosing-bugs",
+        "skills/productivity/handoff",
+        "skills/productivity/grilling"
+      ],
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha": "f1dd2c09108dde1a5f56097cee8461b3ea834499",
+          "size": 1068
+        },
+        {
+          "path": "skills/engineering/code-review/SKILL.md",
+          "sha": "373a4f26e6cfa3617778397945bb069d9cb184bc",
+          "size": 6670
+        },
+        {
+          "path": "skills/engineering/code-review/agents/openai.yaml",
+          "sha": "9076774ba327f49068db9273feceda03bfe940fa",
+          "size": 100
+        },
+        {
+          "path": "skills/engineering/codebase-design/DEEPENING.md",
+          "sha": "cd94075cfd754d147555c5d747a16431ed4c7dd8",
+          "size": 2553
+        },
+        {
+          "path": "skills/engineering/codebase-design/DESIGN-IT-TWICE.md",
+          "sha": "d0990138c35c800bd821289a73115e52680c1620",
+          "size": 2665
+        },
+        {
+          "path": "skills/engineering/codebase-design/SKILL.md",
+          "sha": "3f63c8146dd2604b419c929e9876b90c30d410e9",
+          "size": 6446
+        },
+        {
+          "path": "skills/engineering/codebase-design/agents/openai.yaml",
+          "sha": "3180715edb37f6e96bec42f92f00169faa8886ef",
+          "size": 102
+        },
+        {
+          "path": "skills/engineering/diagnosing-bugs/SKILL.md",
+          "sha": "d039541ddd1c46e6ddbd662fe99d49b686fc5e12",
+          "size": 8664
+        },
+        {
+          "path": "skills/engineering/diagnosing-bugs/agents/openai.yaml",
+          "sha": "a13a755a77634ce61a649a3a0d905a66d3865b35",
+          "size": 103
+        },
+        {
+          "path": "skills/engineering/diagnosing-bugs/scripts/hitl-loop.template.sh",
+          "sha": "243198464a8401a7ba1d63b3708fa43c3d067665",
+          "size": 1316
+        },
+        {
+          "path": "skills/engineering/domain-modeling/ADR-FORMAT.md",
+          "sha": "d7e61f30a9fd8ca70d9ee68f019c2a9ebf2d13f7",
+          "size": 2733
+        },
+        {
+          "path": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+          "sha": "9c0b4c7a2e8507c23cbb5e0baa66d81699321cc6",
+          "size": 2300
+        },
+        {
+          "path": "skills/engineering/domain-modeling/SKILL.md",
+          "sha": "a4438c6879c517d1a08e2b5fbca049b632688dfe",
+          "size": 3346
+        },
+        {
+          "path": "skills/engineering/domain-modeling/agents/openai.yaml",
+          "sha": "7f1522d2f11506ee205275ab7c282aa52366ecf6",
+          "size": 101
+        },
+        {
+          "path": "skills/engineering/grill-with-docs/SKILL.md",
+          "sha": "62b9efb6f991d1b229adee7506962f13ced0c499",
+          "size": 247
+        },
+        {
+          "path": "skills/engineering/grill-with-docs/agents/openai.yaml",
+          "sha": "5dbe2780a51be3e9b118bd7758a73e54a9384e11",
+          "size": 145
+        },
+        {
+          "path": "skills/engineering/implement/SKILL.md",
+          "sha": "bd49e472984c7b99aac40286fdae749bb955a842",
+          "size": 622
+        },
+        {
+          "path": "skills/engineering/implement/agents/openai.yaml",
+          "sha": "f8794dc153b409052a9167baf10858cf01b36175",
+          "size": 139
+        },
+        {
+          "path": "skills/engineering/tdd/SKILL.md",
+          "sha": "01eadaa34e7c9a63a67d6dc3cce1cc81b0e49985",
+          "size": 3629
+        },
+        {
+          "path": "skills/engineering/tdd/agents/openai.yaml",
+          "sha": "651b838a7663e027b1b8884491e867f26bb9a021",
+          "size": 87
+        },
+        {
+          "path": "skills/engineering/tdd/mocking.md",
+          "sha": "71cbfee674d93244ce81d1830b930ca9a69200bd",
+          "size": 1481
+        },
+        {
+          "path": "skills/engineering/tdd/tests.md",
+          "sha": "7ab86479f925a1f9e8ba680af33cb3b12e015381",
+          "size": 2214
+        },
+        {
+          "path": "skills/productivity/grilling/SKILL.md",
+          "sha": "df69d9936880cd3314c28858c6c52f48db23b856",
+          "size": 2049
+        },
+        {
+          "path": "skills/productivity/grilling/agents/openai.yaml",
+          "sha": "ddbdb96139c0c1dfe6bca698f39d0465674b8a39",
+          "size": 113
+        },
+        {
+          "path": "skills/productivity/handoff/SKILL.md",
+          "sha": "a224edc643a20ddb989f9bca1547440169159810",
+          "size": 940
+        },
+        {
+          "path": "skills/productivity/handoff/agents/openai.yaml",
+          "sha": "6e1d8da121beceddc2f9ec7fa8714c1d914dd11a",
+          "size": 141
+        }
+      ]
+    },
+    "Graphify-Labs/graphify": {
+      "commit": "92741d162b2094ffc2fed58cfbd8ee823e9da62c",
+      "prefixes": [
+        "graphify/skill-agents.md",
+        "graphify/skills/agents/references"
+      ],
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+          "size": 11358
+        },
+        {
+          "path": "LICENSE-MIT",
+          "sha": "b1d9746fb5c6c39fd502e2ebe432a12ad9a097f3",
+          "size": 1068
+        },
+        {
+          "path": "NOTICE",
+          "sha": "791bf88bb1e50572902dbbe9228153ea29846adf",
+          "size": 335
+        },
+        {
+          "path": "graphify/skill-agents.md",
+          "sha": "f4fee6921d8d66d7dcc5cfe7231782fc1a27c87d",
+          "size": 47268
+        },
+        {
+          "path": "graphify/skills/agents/references/add-watch.md",
+          "sha": "349f8b409a30a2b53eacacdd390608b96a4d88a3",
+          "size": 2704
+        },
+        {
+          "path": "graphify/skills/agents/references/exports.md",
+          "sha": "96e400fb48b2003bb8b3d370a64b3ade6bcb43a0",
+          "size": 4774
+        },
+        {
+          "path": "graphify/skills/agents/references/extraction-spec.md",
+          "sha": "17c25da894a5b218597dc0aef59dd8e9273ea640",
+          "size": 9235
+        },
+        {
+          "path": "graphify/skills/agents/references/github-and-merge.md",
+          "sha": "a41ea06e17c1676483356a2a06504a1bfb0870e4",
+          "size": 2177
+        },
+        {
+          "path": "graphify/skills/agents/references/hooks.md",
+          "sha": "3fb74d1545394154c30ee052f24da8dd07dd9e9f",
+          "size": 1270
+        },
+        {
+          "path": "graphify/skills/agents/references/query.md",
+          "sha": "8db31ffab052c32c5e48721fdcddc01a0c132eb2",
+          "size": 13724
+        },
+        {
+          "path": "graphify/skills/agents/references/transcribe.md",
+          "sha": "b967f8379998b890945706b3c95fef23b2ec402f",
+          "size": 3173
+        },
+        {
+          "path": "graphify/skills/agents/references/update.md",
+          "sha": "b7644de12a85a435cc1abd29be210d6ed0b5bd27",
+          "size": 11279
+        }
+      ]
+    },
+    "vercel-labs/agent-skills": {
+      "commit": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "prefixes": [
+        "skills/react-best-practices",
+        "skills/web-design-guidelines",
+        "skills/composition-patterns"
+      ],
+      "files": [
+        {
+          "path": "skills/composition-patterns/AGENTS.md",
+          "sha": "558bf9aa1e36db2161f1633c9bfae14a819f0508",
+          "size": 22627
+        },
+        {
+          "path": "skills/composition-patterns/README.md",
+          "sha": "01f359b0e79ce544d1463057be54946e50d62bcd",
+          "size": 2140
+        },
+        {
+          "path": "skills/composition-patterns/SKILL.md",
+          "sha": "d07025bf943345bc1cf15eb923594f889ff881f0",
+          "size": 2886
+        },
+        {
+          "path": "skills/composition-patterns/metadata.json",
+          "sha": "3470b744190af044373abbfe80d94630c0cc6041",
+          "size": 530
+        },
+        {
+          "path": "skills/composition-patterns/rules/_sections.md",
+          "sha": "f921dd41b53e4d847f25a6b3eca25a4e8857db44",
+          "size": 829
+        },
+        {
+          "path": "skills/composition-patterns/rules/_template.md",
+          "sha": "119a30167f162c439f05e73c63044c590dff645c",
+          "size": 329
+        },
+        {
+          "path": "skills/composition-patterns/rules/architecture-avoid-boolean-props.md",
+          "sha": "ccee19ce495b9d7fdf08867db3c6b6282006312e",
+          "size": 2267
+        },
+        {
+          "path": "skills/composition-patterns/rules/architecture-compound-components.md",
+          "sha": "e5e3043cb5a81b83dce0389848b828455f00854f",
+          "size": 2600
+        },
+        {
+          "path": "skills/composition-patterns/rules/patterns-children-over-render-props.md",
+          "sha": "d4345ee30aea5f1b11815251edca7ebd0aefe2e2",
+          "size": 1886
+        },
+        {
+          "path": "skills/composition-patterns/rules/patterns-explicit-variants.md",
+          "sha": "56e32e8bee5e5768f747db4e9718a6c2b54bfce5",
+          "size": 2395
+        },
+        {
+          "path": "skills/composition-patterns/rules/react19-no-forwardref.md",
+          "sha": "e0d8f8a76f14888f2fafc8cccd3d9395e4711d0d",
+          "size": 953
+        },
+        {
+          "path": "skills/composition-patterns/rules/state-context-interface.md",
+          "sha": "d961bede0c6c6e318f6ba3aca9b5dfcdb768d8f9",
+          "size": 4974
+        },
+        {
+          "path": "skills/composition-patterns/rules/state-decouple-implementation.md",
+          "sha": "71a5afaa7d7078c262c92d32c3b97723de62f99f",
+          "size": 2699
+        },
+        {
+          "path": "skills/composition-patterns/rules/state-lift-state.md",
+          "sha": "d7fe27b54933135f9050365b6c2001c101029d51",
+          "size": 3224
+        },
+        {
+          "path": "skills/react-best-practices/AGENTS.md",
+          "sha": "4e340a50684a8e7811d5bfa4df48bd9989d0fd87",
+          "size": 108261
+        },
+        {
+          "path": "skills/react-best-practices/README.md",
+          "sha": "f283e1c0c21c5b13c848452528c3949ff544846c",
+          "size": 3360
+        },
+        {
+          "path": "skills/react-best-practices/SKILL.md",
+          "sha": "237988de4a66dd8a71d30a2c24ebe1a86b58d04e",
+          "size": 7251
+        },
+        {
+          "path": "skills/react-best-practices/metadata.json",
+          "sha": "3bec38b176cc71d105895ec4678bbe79305dcb4c",
+          "size": 921
+        },
+        {
+          "path": "skills/react-best-practices/rules/_sections.md",
+          "sha": "4d20c144bc3b9265fc5976c704a8dd60ed3a806a",
+          "size": 1554
+        },
+        {
+          "path": "skills/react-best-practices/rules/_template.md",
+          "sha": "1e9e70703485021e0b969f5731f38c8b9f8694db",
+          "size": 631
+        },
+        {
+          "path": "skills/react-best-practices/rules/advanced-effect-event-deps.md",
+          "sha": "24d901b62be66f6088eb1de5b262e67f5c337d57",
+          "size": 1802
+        },
+        {
+          "path": "skills/react-best-practices/rules/advanced-event-handler-refs.md",
+          "sha": "97e7ade243aa6dae50d6faa5111dea0d04778ead",
+          "size": 1483
+        },
+        {
+          "path": "skills/react-best-practices/rules/advanced-init-once.md",
+          "sha": "73ee38e5e74c0afa28cb730afe3275479432092a",
+          "size": 958
+        },
+        {
+          "path": "skills/react-best-practices/rules/advanced-use-latest.md",
+          "sha": "9c7cb501693d4a9521697f13dbd5906dd99f0257",
+          "size": 1072
+        },
+        {
+          "path": "skills/react-best-practices/rules/async-api-routes.md",
+          "sha": "6feda1ef0ac06b57b33c7b5bd6a19ca88d6c8a34",
+          "size": 1125
+        },
+        {
+          "path": "skills/react-best-practices/rules/async-cheap-condition-before-await.md",
+          "sha": "5799d7f6ee6e9d70422048ab0cae06ca021d22b2",
+          "size": 1220
+        },
+        {
+          "path": "skills/react-best-practices/rules/async-defer-await.md",
+          "sha": "460b5e16baf9c66f85e4169eb9d43e4d07f2ce94",
+          "size": 2208
+        },
+        {
+          "path": "skills/react-best-practices/rules/async-dependencies.md",
+          "sha": "0484ebab993f3db78277e8731872473d02475e6d",
+          "size": 1293
+        },
+        {
+          "path": "skills/react-best-practices/rules/async-parallel.md",
+          "sha": "64133f6c31fec81eaaabd712586337d20122e09f",
+          "size": 654
+        },
+        {
+          "path": "skills/react-best-practices/rules/async-suspense-boundaries.md",
+          "sha": "1fbc05b04ed2474637b12014a77688750e78f931",
+          "size": 2510
+        },
+        {
+          "path": "skills/react-best-practices/rules/bundle-analyzable-paths.md",
+          "sha": "8276f156cf1aa8a611bd5bc3cadcb362e16ccd13",
+          "size": 2382
+        },
+        {
+          "path": "skills/react-best-practices/rules/bundle-barrel-imports.md",
+          "sha": "22d1050196671b7bc9f9aaf88cc665ba6fa8deb0",
+          "size": 2795
+        },
+        {
+          "path": "skills/react-best-practices/rules/bundle-conditional.md",
+          "sha": "99d6fc90e31d683d2b6b71353b92d620b484b644",
+          "size": 949
+        },
+        {
+          "path": "skills/react-best-practices/rules/bundle-defer-third-party.md",
+          "sha": "db041d1510e51defeade05926ba4e6bbad1068b5",
+          "size": 920
+        },
+        {
+          "path": "skills/react-best-practices/rules/bundle-dynamic-imports.md",
+          "sha": "60b62695e7a080e2020ff2242d8d841c5e3ecbc4",
+          "size": 791
+        },
+        {
+          "path": "skills/react-best-practices/rules/bundle-preload.md",
+          "sha": "7000504065472628ae614786a3faadd23b0435a7",
+          "size": 1149
+        },
+        {
+          "path": "skills/react-best-practices/rules/client-event-listeners.md",
+          "sha": "aad4ae91605d715aad8e92b76bd7fb85c91d7cdf",
+          "size": 1969
+        },
+        {
+          "path": "skills/react-best-practices/rules/client-localstorage-schema.md",
+          "sha": "d30a1a7d4f85b0d50a0808eaa1b382c6deb595f4",
+          "size": 1950
+        },
+        {
+          "path": "skills/react-best-practices/rules/client-passive-event-listeners.md",
+          "sha": "ce39a889efb4452ec4c044555ff818301dcf7ece",
+          "size": 1644
+        },
+        {
+          "path": "skills/react-best-practices/rules/client-swr-dedup.md",
+          "sha": "2a430f27fd6abdc1b1b2f809b7a60114ff506790",
+          "size": 1159
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-batch-dom-css.md",
+          "sha": "a62d84ed8149b6d4f173debc7043af03f8f8dd06",
+          "size": 3266
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-cache-function-results.md",
+          "sha": "180f8ac8fffd7e6ee320242d59d06565d40a12f8",
+          "size": 1949
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-cache-property-access.md",
+          "sha": "39eec9061b4ca820150cc8183fb73f9e0c91ce85",
+          "size": 532
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-cache-storage.md",
+          "sha": "aa4a30c08176aabd27b41fa44d5c1981457b675f",
+          "size": 1651
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-combine-iterations.md",
+          "sha": "044d017ec3b24b53e46d638acd1d936a22ac6323",
+          "size": 753
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-early-exit.md",
+          "sha": "f46cb89c6cbe06e481aba0136848e3b17263ba96",
+          "size": 1133
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-flatmap-filter.md",
+          "sha": "ee0edf0da256eb8b62c5a998c768c51eb520e8cd",
+          "size": 1411
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-hoist-regexp.md",
+          "sha": "dae3fefdc0a1db66badcd4875489715edcdb038b",
+          "size": 1028
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-index-maps.md",
+          "sha": "9d357a00b15ac67cdd638886f5197a13173a637d",
+          "size": 837
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-length-check-first.md",
+          "sha": "8b89573630fdc3aa10564273f390ecc7e2b1cd3e",
+          "size": 1747
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-min-max-loop.md",
+          "sha": "4b6656e96aecf3ae6ade52974090ae8b3e3f2bb5",
+          "size": 2290
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-request-idle-callback.md",
+          "sha": "d81927e5f0ddb9fa4eece79197728bfc4382cbfe",
+          "size": 2647
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-set-map-lookups.md",
+          "sha": "680a4892ee291c432bf8e769a44d0f1eb102b74b",
+          "size": 532
+        },
+        {
+          "path": "skills/react-best-practices/rules/js-tosorted-immutable.md",
+          "sha": "eae8b3f8aed2c7a893ceaae4cab55fa1c444b309",
+          "size": 1782
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-activity.md",
+          "sha": "c957a490b7c2688542766150741e85e066539251",
+          "size": 564
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-animate-svg-wrapper.md",
+          "sha": "646744cbe53b213c6fa5ead54ef107510e5be89d",
+          "size": 1185
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-conditional-render.md",
+          "sha": "7e866f5852dac80e0822e7f7c33476f5c9fc22f1",
+          "size": 980
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-content-visibility.md",
+          "sha": "aa6656362b2c0dad9ffea788b5850843d6c0629e",
+          "size": 815
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-hoist-jsx.md",
+          "sha": "32d2f3fcea53dadcf847231ee20c60fa2c5c3049",
+          "size": 1039
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-hydration-no-flicker.md",
+          "sha": "5cf0e79b69afd7564b965c09435a2c7ee79eb2bd",
+          "size": 2308
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-hydration-suppress-warning.md",
+          "sha": "24ba2513a29f5259b3184695d2d4da25e03e42ac",
+          "size": 872
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-resource-hints.md",
+          "sha": "1290bef06baf459f85dc5856ffc4486951224a48",
+          "size": 2549
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-script-defer-async.md",
+          "sha": "ee275ed1c06da8f1ae70e744e47965799eaebf02",
+          "size": 1868
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-svg-precision.md",
+          "sha": "6d7712860365294936a1b736d29d3eb970b91da7",
+          "size": 588
+        },
+        {
+          "path": "skills/react-best-practices/rules/rendering-usetransition-loading.md",
+          "sha": "0c1b0b98e884d2c77bdec66df754693bd48c7777",
+          "size": 2074
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-defer-reads.md",
+          "sha": "e867c95f02fe6ed6ac2f91fdf1c0922304e0423a",
+          "size": 973
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-dependencies.md",
+          "sha": "47a4d92685702e3a3b07073c62a61800fa0a6d7d",
+          "size": 824
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-derived-state-no-effect.md",
+          "sha": "3d9fe4050794ea6655add6bee50cfbc104e5dc31",
+          "size": 1201
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-derived-state.md",
+          "sha": "e5c899f6c073338bbd1b73c0275bc3e5e7d9ae7b",
+          "size": 728
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-functional-setstate.md",
+          "sha": "b004ef45e347503947fee397b6c3d163b0a317fb",
+          "size": 2968
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-lazy-state-init.md",
+          "sha": "4ecb350fbadff3db805b72429276e672d42736dc",
+          "size": 2016
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-memo-with-default-value.md",
+          "sha": "63570491848cb42c2bc7073bceb754893a6a4cfa",
+          "size": 1173
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-memo.md",
+          "sha": "f8982ab612105a3b7faee1292b797338e7fb5271",
+          "size": 1148
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-move-effect-to-event.md",
+          "sha": "dd58a1af091b3cf5cb271d25904af4feb836d1aa",
+          "size": 1268
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-no-inline-components.md",
+          "sha": "d97592acefced05bc4a8538c77d226fa24c08534",
+          "size": 2135
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-simple-expression-in-memo.md",
+          "sha": "59dfab0f3b048097627e0ca6e4c8da36629a5268",
+          "size": 1018
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-split-combined-hooks.md",
+          "sha": "89d805644dbffe3877bc1356bdf8ad416a5c715b",
+          "size": 1844
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-transitions.md",
+          "sha": "d99f43f764232e994a49a1df89ec9d624552f439",
+          "size": 1055
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-use-deferred-value.md",
+          "sha": "619c04b0142bf5a5b7d0f69532a56b797a78f664",
+          "size": 1846
+        },
+        {
+          "path": "skills/react-best-practices/rules/rerender-use-ref-transient-values.md",
+          "sha": "cf04b81f8a531eacd07a32e8917fb3ed3c1bbecb",
+          "size": 1742
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-after-nonblocking.md",
+          "sha": "e8f5b260f5fc6d58141bc61e0a091569adb81e7e",
+          "size": 2012
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-auth-actions.md",
+          "sha": "ee82c0442bc69ffae7bf20c07709d57893da1123",
+          "size": 2649
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-cache-lru.md",
+          "sha": "ef6938aa53c55dc3c0035bd6c66838810d870260",
+          "size": 1353
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-cache-react.md",
+          "sha": "87c9ca33168a321a59fbaaa84843e2f48c99751a",
+          "size": 2228
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-dedup-props.md",
+          "sha": "fb24a2562c73fadbb9a11a79897c2cf93ea3c69a",
+          "size": 2060
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-hoist-static-io.md",
+          "sha": "25205c2fc42d0dd684d6423acde642774329a8cc",
+          "size": 4423
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-no-shared-module-state.md",
+          "sha": "ff7d9f29c6e0e42ec1471acec8a3c7f394c8358d",
+          "size": 1766
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-parallel-fetching.md",
+          "sha": "1affc835a601a894fd02de08e6c9cdfd76d34b64",
+          "size": 1554
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-parallel-nested-fetching.md",
+          "sha": "be1dc25075e40e6bda46cb24dc5a6f42b916b0e8",
+          "size": 992
+        },
+        {
+          "path": "skills/react-best-practices/rules/server-serialization.md",
+          "sha": "39c5c4164c31be7f171ea2f4b3b32fe47709a651",
+          "size": 996
+        },
+        {
+          "path": "skills/web-design-guidelines/SKILL.md",
+          "sha": "ceae92ab319216a68274168fba9b63b998b65997",
+          "size": 1231
+        }
+      ]
+    },
+    "supabase/agent-skills": {
+      "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+      "prefixes": [
+        "skills/supabase-postgres-best-practices"
+      ],
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha": "d3c9e94fbc6c28f66ecb5a01407d543c99c811b6",
+          "size": 1065
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/CHANGELOG.md",
+          "sha": "6d7d0d2acd380d09be9a4431037858149ce3496f",
+          "size": 5684
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/SKILL.md",
+          "sha": "6400792389dfcc82c81953054e546bd72ebcd259",
+          "size": 3231
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/_contributing.md",
+          "sha": "1c055aff9ad2bf12cfe7edc0002f2f77fe6980d2",
+          "size": 4113
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/_sections.md",
+          "sha": "8ba57c23e8119e411fcc8a230cda08e695792cac",
+          "size": 1682
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/_template.md",
+          "sha": "91ace90e10a4d8ef354a82bb1994842e6979ebed",
+          "size": 1040
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/advanced-full-text-search.md",
+          "sha": "582cbeaada9378a280ad61f57e06c10d258e3c43",
+          "size": 1468
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md",
+          "sha": "e3d261ea117fd7b1ad9c4f0d45308407b898ed5a",
+          "size": 1444
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/conn-idle-timeout.md",
+          "sha": "40b9cc50dd12cf347ed189fac965673b533f3f99",
+          "size": 1282
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/conn-limits.md",
+          "sha": "cb3e400c0234e7e9196c1650423faad66375b70b",
+          "size": 1325
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/conn-pooling.md",
+          "sha": "e2ebd581d3c85bff0a077e8d9a2cb562d2513d03",
+          "size": 1382
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/conn-prepared-statements.md",
+          "sha": "555547d834e35b5059152dfb2288eca5e9838ea0",
+          "size": 1529
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/data-batch-inserts.md",
+          "sha": "997947cb17bfed67f29eaa8da2a58de2306cc2c1",
+          "size": 1287
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/data-n-plus-one.md",
+          "sha": "2109186ff88b3ba1cc32789f81e2a00d345c6e3f",
+          "size": 1361
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/data-pagination.md",
+          "sha": "633d839323612e212a833dd96828cb31fdfb39f8",
+          "size": 1358
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/data-upsert.md",
+          "sha": "bc95e2305d955679446c70854cb2b56b183aa56d",
+          "size": 1390
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/lock-advisory.md",
+          "sha": "572eaf0dcf518ac925c4cde41beb60b62852b79c",
+          "size": 1531
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md",
+          "sha": "974da5edec32f79de0fcdc771d4ef759dc3e049d",
+          "size": 1855
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/lock-short-transactions.md",
+          "sha": "e6b8ef2633248a4aa4394628e48d8cb693e7e6ab",
+          "size": 1350
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/lock-skip-locked.md",
+          "sha": "77bdbb97045010ce2fdbd90733e8f764be82881a",
+          "size": 1353
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md",
+          "sha": "542978c3bafc510fa8d7a8864cff994ad40be4d7",
+          "size": 1441
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md",
+          "sha": "d7e82f1aacd105d53789eb6188d11e8ea39e7310",
+          "size": 1418
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md",
+          "sha": "e0e8ea0b7db8c1513a0d1605be477192bc21d91d",
+          "size": 1506
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/query-composite-indexes.md",
+          "sha": "fea64523fd5bb3696f943d486ccaf2aea75d27b8",
+          "size": 1454
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/query-covering-indexes.md",
+          "sha": "9d2a4947b94516dd975e1044d132bb007280f478",
+          "size": 1287
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/query-index-types.md",
+          "sha": "93b32590f4bfe377869274f45414ae6e43d168fa",
+          "size": 1521
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/query-missing-indexes.md",
+          "sha": "e6daace7dd368c75cdf87dc61be4afd6ff66cbbe",
+          "size": 1218
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/query-partial-indexes.md",
+          "sha": "3e61a3417b9cce3c8cee99b39b78b7ebf495dd1f",
+          "size": 1347
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/schema-constraints.md",
+          "sha": "1d2ef8f9a968cd6fa882c7299134c30ace06373c",
+          "size": 1880
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/schema-data-types.md",
+          "sha": "f253a5819d05531371e04485ab84f552fbb32fbe",
+          "size": 1453
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md",
+          "sha": "6c3d6ff622b8a9df358f6673f323292e682ce87c",
+          "size": 1679
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md",
+          "sha": "f0072940b159ff64e0c2d4fbb499133cb8f49a66",
+          "size": 1728
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/schema-partitioning.md",
+          "sha": "13137a03275fa45001c870a40b0069204d44e005",
+          "size": 1548
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/schema-primary-keys.md",
+          "sha": "fb0fbb166fac9ea38c127d807a263282acc2dc93",
+          "size": 1821
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/security-privileges.md",
+          "sha": "448ec345fab6c5a0116c584d65638b86d758c558",
+          "size": 1566
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/security-rls-basics.md",
+          "sha": "c61e1a8503de113be0981759b82f5e37090f344c",
+          "size": 1372
+        },
+        {
+          "path": "skills/supabase-postgres-best-practices/references/security-rls-performance.md",
+          "sha": "c3c7c416d57d9a46a9993f4e0c20f772fb64483d",
+          "size": 2103
+        }
+      ]
+    },
+    "vercel-labs/openreview": {
+      "commit": "672deb21e70e471e0536d5ad7a67c14b8359e97e",
+      "prefixes": [
+        ".agents/skills/next-best-practices"
+      ],
+      "files": [
+        {
+          "path": ".agents/skills/next-best-practices/SKILL.md",
+          "sha": "437896b40cc30d87f617661c4f12ba424d303fe4",
+          "size": 4004
+        },
+        {
+          "path": ".agents/skills/next-best-practices/async-patterns.md",
+          "sha": "dce8d8ccf3f10195f3be5c233571f85443d54828",
+          "size": 1664
+        },
+        {
+          "path": ".agents/skills/next-best-practices/bundling.md",
+          "sha": "ac5e814c1d3738b818c317c4648f67bfbb454fe7",
+          "size": 4456
+        },
+        {
+          "path": ".agents/skills/next-best-practices/data-patterns.md",
+          "sha": "8fc17f1fe3abb24befc1b202e33dcbfe113cb07b",
+          "size": 6687
+        },
+        {
+          "path": ".agents/skills/next-best-practices/debug-tricks.md",
+          "sha": "9151ce66c886a9968f88868c2e15b182f776e702",
+          "size": 2953
+        },
+        {
+          "path": ".agents/skills/next-best-practices/directives.md",
+          "sha": "1ea1637d0b24666688a24a30d96537d82048ff8e",
+          "size": 1476
+        },
+        {
+          "path": ".agents/skills/next-best-practices/error-handling.md",
+          "sha": "663e37b6422909687c36add294b1ff022062213f",
+          "size": 4736
+        },
+        {
+          "path": ".agents/skills/next-best-practices/file-conventions.md",
+          "sha": "c2b3b4069b24ee097e51464f4b2f7d4e7f8edb66",
+          "size": 3464
+        },
+        {
+          "path": ".agents/skills/next-best-practices/font.md",
+          "sha": "7e526850915cb902b176ec0393bbcfbc818445c1",
+          "size": 5196
+        },
+        {
+          "path": ".agents/skills/next-best-practices/functions.md",
+          "sha": "8f28a8b675d6f3914c1f8785827b90dea9333b4a",
+          "size": 4388
+        },
+        {
+          "path": ".agents/skills/next-best-practices/hydration-error.md",
+          "sha": "36d48295bd20ec82f261b7e4b7059ccb0db7bc0c",
+          "size": 1801
+        },
+        {
+          "path": ".agents/skills/next-best-practices/image.md",
+          "sha": "aa9d28db9da3fb8dede993e6e8ecba544fb900f7",
+          "size": 3882
+        },
+        {
+          "path": ".agents/skills/next-best-practices/metadata.md",
+          "sha": "5a0f6551c0d16c223cbc3a4a825e8ef0563c0834",
+          "size": 7140
+        },
+        {
+          "path": ".agents/skills/next-best-practices/parallel-routes.md",
+          "sha": "51e270d82a269bcb2b528b4943fcde10c8241638",
+          "size": 7171
+        },
+        {
+          "path": ".agents/skills/next-best-practices/route-handlers.md",
+          "sha": "25e6f4d79ba5ce81516b97d7e6e9b523196fb2d3",
+          "size": 3244
+        },
+        {
+          "path": ".agents/skills/next-best-practices/rsc-boundaries.md",
+          "sha": "0c2208d320648a733bbc038aa710e149f5efb124",
+          "size": 4309
+        },
+        {
+          "path": ".agents/skills/next-best-practices/runtime-selection.md",
+          "sha": "cec960d767479a400d99a4f6b27b049e279fe506",
+          "size": 985
+        },
+        {
+          "path": ".agents/skills/next-best-practices/scripts.md",
+          "sha": "4eeb744c84852c285b8bc4ee35abad3083afc0c3",
+          "size": 3326
+        },
+        {
+          "path": ".agents/skills/next-best-practices/self-hosting.md",
+          "sha": "4b3966adf5168af92414fa63377dcc66b5233f48",
+          "size": 8334
+        },
+        {
+          "path": ".agents/skills/next-best-practices/suspense-boundaries.md",
+          "sha": "5134fa4d909310f10a5ba348d3d746467cb03406",
+          "size": 1366
+        }
+      ]
+    }
+  }
+}
