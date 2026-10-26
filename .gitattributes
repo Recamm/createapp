@@ -1,0 +1,3 @@
+* text=auto eol=lf
+# Pinned blobs must retain their exact bytes for integrity verification.
+source-cache/* -text
