@@ -200,6 +200,8 @@ def preview(raw, workspace):
     if config["stack"] == "auto": messages.append("No se detectó stack.")
     if config["template"] == "config-only": messages.append("Se generan reglas y skills. El código existente se conserva; no se crea una app nueva.")
     if "graphify" in config["packs"]: messages.append("Graphify queda preparado. La instalación de su CLI requiere ejecutar el script local indicado.")
+    if "impeccable" in roles: messages.append("Impeccable se incluye como referencia bajo pedido, sin motor, hooks, detector ni modos live/generate.")
+    if "find-skills" in roles: messages.append("Find Skills permite búsquedas bajo pedido con conexión; no instala Node/npm, el CLI ni otras skills.")
     digest = hashlib.sha256(json_text(config).encode()).hexdigest()
     return {"config": config, "target": str(target), "config_hash": digest, "roles": list(roles), "files": sorted(files), "conflicts": conflicts, "warnings": messages, "sources": [{"repo": r, "commit": s["commit"], "files": len(s["files"]), "bytes": sum(x["size"] for x in s["files"])} for r, s in sources.items()]}
 

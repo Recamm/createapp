@@ -36,6 +36,91 @@ class EngineTests(unittest.TestCase):
         self.assertNotIn("matt-workflow", p["roles"])
         self.assertNotIn("composition", p["roles"])
 
+    def test_impeccable_is_optional_and_selected_explicitly(self):
+        default = preview(self.config, self.root)
+        self.assertNotIn("impeccable", default["config"]["packs"])
+        self.assertNotIn("impeccable", default["roles"])
+        self.assertNotIn("pbakaus/impeccable", {source["repo"] for source in default["sources"]})
+        self.config["packs"].append("impeccable")
+        selected = preview(self.config, self.root)
+        self.assertIn("impeccable", selected["roles"])
+        self.assertIn(".agents/skills/ca-impeccable/SKILL.md", selected["files"])
+        self.assertIn("pbakaus/impeccable", {source["repo"] for source in selected["sources"]})
+        self.assertTrue(any("Impeccable" in warning for warning in selected["warnings"]))
+        self.config["skills"] = ["workflow"]
+        excluded = preview(self.config, self.root)
+        self.assertNotIn("impeccable", excluded["roles"])
+        self.assertNotIn("pbakaus/impeccable", {source["repo"] for source in excluded["sources"]})
+        self.assertFalse(any("Impeccable" in warning for warning in excluded["warnings"]))
+
+    def test_impeccable_offline_install_is_manual_and_reference_only(self):
+        self.config.update(packs=["impeccable"], coordinator="simple", agents=["copilot", "claude"], vercel_react=False, vercel_web=False)
+        with patch("urllib.request.urlopen", side_effect=AssertionError("network should not be used")):
+            initialize(self.config, self.root, cache=self.root / "empty-cache")
+        target = self.root / "mi-app"
+        for skill_root in (".agents/skills", ".claude/skills"):
+            rendered = (target / skill_root / "ca-impeccable/SKILL.md").read_text(encoding="utf-8")
+            self.assertIn("disable-model-invocation: true", rendered)
+            self.assertIn("sin motor ni launcher", rendered)
+            self.assertIn("No ejecutar `impeccable context`", rendered)
+            self.assertIn("reference/craft-floor.md", rendered)
+            self.assertIn("no están incluidos en este perfil", rendered)
+        lock = json.loads((target / ".createapp/sources.lock.json").read_text(encoding="utf-8"))
+        source = lock["sources"]["pbakaus/impeccable"]
+        vendor = target / ".createapp/vendor/pbakaus/impeccable"
+        for entry in source["files"]:
+            data = (vendor / entry["path"]).read_bytes()
+            self.assertEqual(blob_hash(data), entry["sha"])
+            self.assertEqual(len(data), entry["size"])
+            self.assertTrue(entry["path"].endswith(".md") or entry["path"] == "LICENSE")
+        self.assertTrue((vendor / "LICENSE").is_file())
+        self.assertTrue((vendor / "NOTICE.md").is_file())
+        self.assertFalse((vendor / ".agents/skills/impeccable/scripts").exists())
+        self.assertFalse((target / ".github/hooks").exists())
+        self.assertFalse((target / ".claude/settings.json").exists())
+        self.assertFalse((target / ".createapp/tools").exists())
+
+    def test_find_skills_is_optional_and_selected_explicitly(self):
+        default = preview(self.config, self.root)
+        self.assertNotIn("find-skills", default["config"]["packs"])
+        self.assertNotIn("find-skills", default["roles"])
+        self.assertNotIn("vercel-labs/skills", {source["repo"] for source in default["sources"]})
+        self.config["packs"].append("find-skills")
+        selected = preview(self.config, self.root)
+        self.assertIn("find-skills", selected["roles"])
+        self.assertIn(".agents/skills/ca-find-skills/SKILL.md", selected["files"])
+        self.assertIn("vercel-labs/skills", {source["repo"] for source in selected["sources"]})
+        self.assertTrue(any("Find Skills" in warning for warning in selected["warnings"]))
+        self.config["skills"] = ["workflow"]
+        excluded = preview(self.config, self.root)
+        self.assertNotIn("find-skills", excluded["roles"])
+        self.assertNotIn("vercel-labs/skills", {source["repo"] for source in excluded["sources"]})
+        self.assertFalse(any("Find Skills" in warning for warning in excluded["warnings"]))
+
+    def test_find_skills_offline_install_does_not_install_cli_or_other_skills(self):
+        self.config.update(packs=["find-skills"], coordinator="simple", agents=["copilot", "claude"], vercel_react=False, vercel_web=False)
+        with patch("urllib.request.urlopen", side_effect=AssertionError("network should not be used")):
+            initialize(self.config, self.root, cache=self.root / "empty-cache")
+        target = self.root / "mi-app"
+        for skill_root in (".agents/skills", ".claude/skills"):
+            rendered = (target / skill_root / "ca-find-skills/SKILL.md").read_text(encoding="utf-8")
+            self.assertIn("disable-model-invocation: true", rendered)
+            self.assertIn("`npx skills find` requiere Node.js/npm", rendered)
+            self.assertIn("sin autorización explícita", rendered)
+            self.assertIn("No usar `-g -y` por defecto", rendered)
+            self.assertFalse((target / skill_root / "find-skills").exists())
+        lock = json.loads((target / ".createapp/sources.lock.json").read_text(encoding="utf-8"))
+        self.assertEqual(set(lock["sources"]), {"vercel-labs/skills"})
+        source = lock["sources"]["vercel-labs/skills"]
+        self.assertEqual({entry["path"] for entry in source["files"]}, {"LICENSE", "skills/find-skills/SKILL.md"})
+        for entry in source["files"]:
+            data = (target / ".createapp/vendor/vercel-labs/skills" / entry["path"]).read_bytes()
+            self.assertEqual(blob_hash(data), entry["sha"])
+            self.assertEqual(len(data), entry["size"])
+        self.assertFalse((target / "node_modules").exists())
+        self.assertFalse((target / "package.json").exists())
+        self.assertFalse((target / ".createapp/tools").exists())
+
     def test_matt_replaces_coordinator(self):
         self.config["packs"].append("matt")
         self.config["coordinator"] = "matt"

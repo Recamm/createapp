@@ -2,7 +2,25 @@
 
 Las fuentes originales se conservan sin modificar en la caché por hash y se reconstruyen bajo `.createapp/vendor/` al inicializar. Los perfiles ca-* son adaptaciones de integración y no implican afiliación con sus autores.
 
-Catálogo revisado: 2026-10-24.
+Catálogo base revisado: 2026-10-24. Impeccable y Find Skills incorporados: 2026-11-01.
+
+## vercel-labs/skills
+
+- Fuente: https://github.com/vercel-labs/skills/tree/92a9a34ac3bf88e695e468b90c7bf32f163d32c8
+- Commit: `92a9a34ac3bf88e695e468b90c7bf32f163d32c8`
+- Selección: skills/find-skills/SKILL.md; sin instalar el CLI ni otras skills.
+- Archivos de licencia incluidos:
+  - [LICENSE](third-party/vercel-labs/skills/LICENSE)
+
+## pbakaus/impeccable
+
+- Fuente: https://github.com/pbakaus/impeccable/tree/4f956490f0056ae1ff5ea80372cf56e83c001d3c
+- Commit: `4f956490f0056ae1ff5ea80372cf56e83c001d3c`
+- Selección: SKILL.md y guías de referencia; sin scripts, binarios ni hooks.
+- Licencia: Apache-2.0; conserva el NOTICE original con atribución a ehmo/platform-design-skills (MIT).
+- Archivos de licencia incluidos:
+  - [LICENSE](third-party/pbakaus/impeccable/LICENSE)
+  - [NOTICE.md](third-party/pbakaus/impeccable/NOTICE.md)
 
 ## obra/superpowers
 

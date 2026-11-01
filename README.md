@@ -81,6 +81,8 @@ El menú utiliza flechas, Espacio para marcar y Enter para continuar. Los paquet
 | Addy Osmani Agent Skills | Activo: documentación oficial, seguridad y rendimiento |
 | Matt Pocock Skills | Opcional, desmarcado: handoff y diseño de módulos, o coordinador alternativo |
 | Graphify | Opcional, desmarcado: mapa consultable, solo bajo pedido |
+| Impeccable | Opcional, desmarcado: refinamiento y auditoría visual, solo bajo pedido |
+| Find Skills | Opcional, desmarcado: descubrir y evaluar skills, sin instalarlas automáticamente |
 | Vercel React Best Practices | Recomendado para React/Next.js |
 | Web Design Guidelines | Recomendado para web |
 | Composition Patterns | Opcional, bajo pedido |
@@ -92,6 +94,10 @@ Podés elegir varios asistentes: Copilot, Codex, Claude Code, Cursor y OpenCode.
 Las opciones avanzadas permiten elegir skills individuales dentro de los paquetes seleccionados. Las opciones incompatibles con el stack se omiten. Para quitar la skill del coordinador, primero elegí Proceso simple.
 
 El preset inicial es **Equilibrado**: acordar el enfoque y ejecutar lo acordado; pruebas que reproduzcan lógica y bugs; comprobaciones adecuadas para cambios visuales/configuración. Subagentes desactivados y diseño existente conservado. Ágil aumenta autonomía; Riguroso exige TDD para cambios de comportamiento y revisión por hitos.
+
+Impeccable queda desmarcado porque sus revisiones y recomendaciones visuales se solapan con Anthropic, UI UX Pro Max y Web Design Guidelines. Conviene activarlo para pedir refinamientos concretos, como pulir una pantalla o auditar una interfaz, sin añadir otra revisión automática ni reemplazar el diseño aprobado.
+
+Find Skills queda desmarcado porque descubrir nuevas capacidades es una tarea puntual, no un paso obligatorio de cada proyecto. Conviene activarlo para buscar y comparar skills bajo pedido; instalarlas o actualizarlas requiere autorización explícita sobre su origen y alcance local/global.
 
 ## Reglas compartidas
 
@@ -105,6 +111,8 @@ El preset inicial es **Equilibrado**: acordar el enfoque y ejecutar lo acordado;
 - Ponytail simplifica sin recortar requisitos, seguridad o accesibilidad.
 - Los especialistas no abren otros procesos de coordinación recursivamente.
 - Graphify no inicia análisis, watchers, servicios o llamadas a modelos automáticamente.
+- Impeccable se consulta bajo pedido, sin motor, hooks ni catálogo remoto automático; respeta DESIGN.md y la revisión consolidada.
+- Find Skills no instala ni actualiza otras skills automáticamente, ni convierte los resultados remotos en fuentes revisadas del catálogo.
 
 Se generan **perfiles locales adaptados `ca-*`**. Los originales se conservan sin modificar como referencias fijadas por commit, fuera de las carpetas que descubren skills. No se instalan los plugins oficiales completos, sus hooks, dashboards ni comandos nativos.
 
@@ -134,11 +142,15 @@ Este comando verifica los scripts contra el catálogo fijado antes de ejecutarlo
 
 Graphify conserva una instalación separada y manual. Al seleccionarlo se prepara `.createapp/setup_graphify.py`, que necesita Python 3.10+ para crear su entorno local e instalar `graphifyy==0.9.95`. La referencia de Graphify está fijada por commit por separado; no se afirma identidad exacta con el paquete PyPI. No se ejecuta `graphify install`, para evitar registrar otro perfil.
 
+Impeccable agrega el perfil adaptado `ca-impeccable` y sus guías originales de consulta, disponibles sin conexión. No instala su launcher, motor binario, detector, hooks ni comandos nativos; los modos live/generate tampoco están incluidos. El perfil lee PRODUCT.md y DESIGN.md existentes y usa las herramientas disponibles del asistente. Las funciones ejecutables oficiales requieren una instalación separada y autorización explícita.
+
+Find Skills agrega `ca-find-skills` y su guía original fijada por commit. La guía se instala sin conexión; descubrir skills en skills.sh requiere acceso web. La búsqueda CLI con `npx skills find` necesita Node.js/npm y conexión, que CreateApp no instala. Se priorizan las herramientas web disponibles y se revisan contenido, scripts y licencia antes de recomendar una skill. No se habilita la instalación global ni se usa `-g -y` por defecto.
+
 Las pruebas Python/Playwright de Anthropic también necesitan sus herramientas si se ejecutan literalmente. El asistente debe reutilizar su herramienta de navegador disponible cuando corresponda. `--doctor` informa requisitos; no los instala ni afirma que estén comprobados por encontrar un nombre en PATH.
 
 ## Fuentes y skills.sh
 
-Catálogo revisado el 24 de octubre de 2026. Se buscaron skills en [skills.sh](https://skills.sh) y se incorporaron fuentes originales de [Vercel](https://github.com/vercel-labs/agent-skills), [Vercel openreview](https://github.com/vercel-labs/openreview) y [Supabase](https://github.com/supabase/agent-skills).
+Catálogo base revisado el 24 de octubre de 2026; [Impeccable](https://github.com/pbakaus/impeccable) y [Find Skills](https://skills.sh/vercel-labs/skills/find-skills) incorporados el 1 de noviembre de 2026. Se buscaron skills en [skills.sh](https://skills.sh) y se incorporaron fuentes originales de [Vercel](https://github.com/vercel-labs/agent-skills), [Vercel openreview](https://github.com/vercel-labs/openreview) y [Supabase](https://github.com/supabase/agent-skills).
 
 `source-cache/` incluye las fuentes revisadas para poder configurar sin conexión. `sources.lock.json` fija sus commits y hashes de blob Git. Las fuentes se preparan antes de escribir el proyecto y se verifica su contenido; no se ejecutan scripts al instalarlas.
 

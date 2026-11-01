@@ -8,6 +8,8 @@ PACKS = [
     {"id": "addy", "name": "Addy Osmani Agent Skills", "default": True, "detail": "Selección: documentación oficial, seguridad y rendimiento. Sin segundo planificador."},
     {"id": "matt", "name": "Matt Pocock Skills", "default": False, "detail": "Opcional: handoff y diseño de módulos; puede elegirse como coordinador alternativo."},
     {"id": "graphify", "name": "Graphify", "default": False, "detail": "Opcional: mapa del código, solo bajo pedido. Su CLI se prepara en un entorno local separado."},
+    {"id": "impeccable", "name": "Impeccable", "default": False, "detail": "Opcional: refinamiento visual y auditoría de interfaces bajo pedido. Sin motor, hooks ni comandos nativos."},
+    {"id": "find-skills", "name": "Find Skills", "default": False, "detail": "Opcional: descubrir y evaluar skills bajo pedido. No instala ni actualiza otras skills automáticamente."},
 ]
 
 AGENTS = {"copilot": "GitHub Copilot", "codex": "Codex", "claude": "Claude Code", "cursor": "Cursor", "opencode": "OpenCode"}
@@ -27,6 +29,8 @@ ROLES = {
     "module-design": ("matt", "mattpocock/skills", ["skills/engineering/codebase-design/SKILL.md"], "Bajo pedido: revisar límites de módulos cuando exista acoplamiento o dificultad real para probarlos."),
     "matt-workflow": ("matt", "mattpocock/skills", ["skills/engineering/grill-with-docs/SKILL.md", "skills/engineering/implement/SKILL.md", "skills/engineering/tdd/SKILL.md", "skills/engineering/code-review/SKILL.md"], "Planificar e implementar usando Matt como único coordinador, según la política del proyecto."),
     "graph": ("graphify", "Graphify-Labs/graphify", ["graphify/skill-agents.md"], "Bajo pedido: construir o consultar un mapa estructural. No ejecutar escaneos, watchers ni servicios automáticamente."),
+    "impeccable": ("impeccable", "pbakaus/impeccable", [".agents/skills/impeccable/SKILL.md"], "Bajo pedido: refinar o auditar una interfaz con Impeccable. Respetar DESIGN.md y el alcance aprobado; no duplicar revisiones ni iniciar otro proceso visual."),
+    "find-skills": ("find-skills", "vercel-labs/skills", ["skills/find-skills/SKILL.md"], "Bajo pedido: buscar y evaluar skills para una necesidad concreta. Revisar origen, contenido y licencia; no instalar ni actualizar skills sin autorización explícita."),
     "react": ("vercel_react", "vercel-labs/agent-skills", ["skills/react-best-practices/SKILL.md"], "Aplicar patrones de rendimiento React a código React. Omitir reglas de Next.js en Vite y APIs incompatibles con la versión instalada."),
     "web-review": ("vercel_web", "vercel-labs/agent-skills", ["skills/web-design-guidelines/SKILL.md"], "Bajo pedido o al cerrar un cambio de interfaz: revisar accesibilidad y comportamiento sin rediseñar la identidad."),
     "composition": ("vercel_composition", "vercel-labs/agent-skills", ["skills/composition-patterns/SKILL.md"], "Bajo pedido: mejorar componentes con complejidad demostrada. No crear compound components ni contextos por anticipado."),
