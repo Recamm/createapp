@@ -1,8 +1,12 @@
+import base64
 import copy
 import hashlib
+from http.client import IncompleteRead
+from io import BytesIO, StringIO
 import json
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import threading
 import unittest
@@ -12,9 +16,10 @@ import urllib.request
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from catalog import DEFAULTS, roles_for
-from createapp import AppServer
+from createapp import AppServer, main
 from engine import ConfigError, blob_hash, fetch_blob, initialize, preview, validate
 from policy import policy, wrapper
+from updates import MAX_RELEASE_BYTES, check_for_updates, install_update, internet_available, offer_update, update_message
 
 class EngineTests(unittest.TestCase):
     def setUp(self):
@@ -239,6 +244,244 @@ class EngineTests(unittest.TestCase):
         with self.assertRaises(ConfigError): initialize(self.config, self.root, fetcher=edit_then_download)
         self.assertEqual((target / "AGENTS.md").read_text(), "edited by user")
         self.assertFalse((target / ".createapp").exists())
+
+class UpdateTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.available = {"status": "available", "current": "0.2.0", "latest": "0.3.0", "tag": "v0.3.0"}
+        connectivity = patch("updates.internet_available", return_value=True)
+        connectivity.start()
+        self.addCleanup(connectivity.stop)
+        answers = patch("builtins.input", return_value="n")
+        answers.start()
+        self.addCleanup(answers.stop)
+
+    def test_update_check_compares_versions_numerically(self):
+        release = {"tag_name": "v0.2.10", "draft": False, "prerelease": False}
+        with patch("updates.VERSION", "0.2.9"), patch("urllib.request.urlopen", return_value=BytesIO(json.dumps(release).encode())) as request:
+            result = check_for_updates()
+        self.assertEqual(result["status"], "available")
+        self.assertEqual(result["latest"], "0.2.10")
+        self.assertEqual(request.call_args.kwargs["timeout"], 2)
+        self.assertEqual(request.call_args.args[0].full_url, "https://api.github.com/repos/Recamm/createapp/releases/latest")
+
+    def test_equal_older_draft_and_prerelease_versions(self):
+        cases = [("v0.2.9", False, False, "current"), ("v0.2.8", False, False, "current"), ("v0.3.0", True, False, "unavailable"), ("v0.3.0", False, True, "unavailable"), ("v0.3.0-beta.1", False, False, "unavailable"), ("invalid\ntext", False, False, "unavailable")]
+        for tag, draft, prerelease, expected in cases:
+            release = {"tag_name": tag, "draft": draft, "prerelease": prerelease}
+            with self.subTest(tag=tag, draft=draft, prerelease=prerelease), patch("updates.VERSION", "0.2.9"), patch("urllib.request.urlopen", return_value=BytesIO(json.dumps(release).encode())):
+                self.assertEqual(check_for_updates()["status"], expected)
+
+    def test_every_check_queries_github_without_cache(self):
+        release = json.dumps({"tag_name": "v0.3.0"}).encode()
+        with patch("urllib.request.urlopen", side_effect=lambda *args, **kwargs: BytesIO(release)) as request:
+            for attempt in range(3):
+                self.assertEqual(check_for_updates()["status"], "available")
+            self.assertEqual(request.call_count, 3)
+            with patch("updates.VERSION", "0.3.0"):
+                self.assertEqual(check_for_updates()["status"], "current")
+            self.assertEqual(request.call_count, 4)
+
+    def test_update_check_network_failures_are_silent_and_retried_next_time(self):
+        failures = [TimeoutError("offline"), urllib.error.HTTPError("https://api.github.com", 429, "rate limit", {}, None), IncompleteRead(b"partial")]
+        for failure in failures:
+            with self.subTest(failure=type(failure).__name__), patch("urllib.request.urlopen", side_effect=failure) as request:
+                result = check_for_updates()
+                self.assertEqual(result["status"], "unavailable")
+                self.assertEqual(update_message(result), "")
+                check_for_updates()
+                self.assertEqual(request.call_count, 2)
+
+    def test_malformed_and_oversized_releases_do_not_interrupt_startup(self):
+        for payload in (b"not json", b"[]", b"null", b" " * (MAX_RELEASE_BYTES + 1)):
+            with self.subTest(size=len(payload)), patch("urllib.request.urlopen", return_value=BytesIO(payload)):
+                self.assertEqual(check_for_updates()["status"], "unavailable")
+
+    def test_offline_skips_release_query_and_prompt(self):
+        with patch("updates.internet_available", return_value=False), patch("urllib.request.urlopen") as request, patch("builtins.input") as answer, patch("sys.stderr", new_callable=StringIO) as stderr:
+            result = check_for_updates()
+            self.assertFalse(offer_update(result))
+        request.assert_not_called()
+        answer.assert_not_called()
+        self.assertEqual(stderr.getvalue(), "")
+
+    def test_connectivity_probe_handles_network_failure_and_https_proxy(self):
+        with patch("urllib.request.getproxies", return_value={}), patch("socket.create_connection", side_effect=OSError("offline")) as connection:
+            self.assertFalse(internet_available())
+        connection.assert_called_once_with(("api.github.com", 443), timeout=1)
+        with patch("urllib.request.getproxies", return_value={"https": "http://proxy.example:8080"}), patch("socket.create_connection") as connection:
+            self.assertTrue(internet_available())
+        connection.assert_called_once_with(("proxy.example", 8080), timeout=1)
+
+    def test_current_or_unavailable_release_is_silent(self):
+        for status in ("current", "unavailable"):
+            result = dict(self.available, status=status)
+            self.assertEqual(update_message(result), "")
+            with patch("builtins.input") as answer, patch("updates.install_update") as install, patch("sys.stderr", new_callable=StringIO) as stderr:
+                self.assertFalse(offer_update(result))
+            answer.assert_not_called()
+            install.assert_not_called()
+            self.assertEqual(stderr.getvalue(), "")
+
+    def test_terminal_startup_announces_updates(self):
+        with patch("sys.argv", ["createapp", str(self.root)]), patch("sys.stdin.isatty", return_value=True), patch.dict("os.environ", {"CREATEAPP_NO_UPDATE_CHECK": "0"}), patch("createapp.check_for_updates", return_value=self.available) as check, patch("terminal.run") as run, patch("sys.stderr", new_callable=StringIO) as stderr:
+            main()
+        check.assert_called_once_with()
+        run.assert_called_once()
+        self.assertIn("0.3.0 disponible", stderr.getvalue())
+
+    def test_ui_startup_announces_updates(self):
+        with patch("sys.argv", ["createapp", str(self.root), "--ui", "--no-browser"]), patch.dict("os.environ", {"CREATEAPP_NO_UPDATE_CHECK": "0"}), patch("createapp.check_for_updates", return_value=self.available) as check, patch("createapp.AppServer") as server, patch("sys.stdout", new_callable=StringIO), patch("sys.stderr", new_callable=StringIO) as stderr:
+            server.return_value.base_url = "http://127.0.0.1:12345"
+            server.return_value.token = "fixture"
+            main()
+        check.assert_called_once_with()
+        server.return_value.serve_forever.assert_called_once()
+        server.return_value.server_close.assert_called_once()
+        self.assertIn("0.3.0 disponible", stderr.getvalue())
+
+    def test_explicit_update_check_queries_once_and_ignores_old_opt_out(self):
+        with patch("sys.argv", ["createapp", "--check-updates"]), patch.dict("os.environ", {"CREATEAPP_NO_UPDATE_CHECK": "1"}), patch("createapp.check_for_updates", return_value=self.available) as check, patch("sys.stdout", new_callable=StringIO) as stdout, patch("sys.stderr", new_callable=StringIO) as stderr:
+            main()
+        check.assert_called_once_with()
+        self.assertIn("0.3.0 disponible", stderr.getvalue())
+        self.assertEqual(stdout.getvalue(), "")
+
+    def test_accepting_update_installs_before_running_original_command(self):
+        with patch("sys.argv", ["createapp", str(self.root)]), patch("sys.stdin.isatty", return_value=True), patch("builtins.input", return_value="si"), patch("createapp.check_for_updates", return_value=self.available) as check, patch("updates.install_update") as install, patch("terminal.run") as run, patch("sys.stdout", new_callable=StringIO) as stdout, patch("sys.stderr", new_callable=StringIO) as stderr:
+            main()
+        check.assert_called_once_with()
+        install.assert_called_once_with(self.available)
+        run.assert_not_called()
+        self.assertIn("[s/N]", stderr.getvalue())
+        self.assertEqual(stdout.getvalue(), "")
+
+    def test_declining_or_eof_does_not_download_or_install(self):
+        for answer in ("", "n", "no", EOFError()):
+            with self.subTest(answer=answer), patch("sys.stdin.isatty", return_value=True), patch("builtins.input", **({"side_effect": answer} if isinstance(answer, Exception) else {"return_value": answer})), patch("updates.install_update") as install, patch("urllib.request.urlopen") as download, patch("sys.stderr", new_callable=StringIO):
+                self.assertFalse(offer_update(self.available))
+            install.assert_not_called()
+            download.assert_not_called()
+
+    def test_control_c_at_confirmation_cancels_the_command(self):
+        with patch("sys.stdin.isatty", return_value=True), patch("builtins.input", side_effect=KeyboardInterrupt()), patch("updates.install_update") as install, patch("sys.stderr", new_callable=StringIO):
+            self.assertTrue(offer_update(self.available))
+        install.assert_not_called()
+
+    def test_noninteractive_preview_warns_without_consuming_input_or_changing_json(self):
+        config = self.root / "config.json"
+        config.write_text(json.dumps(DEFAULTS), encoding="utf-8")
+        with patch("sys.argv", ["createapp", str(self.root), "--preview", str(config)]), patch("sys.stdin.isatty", return_value=False), patch("builtins.input") as answer, patch("createapp.check_for_updates", return_value=self.available), patch("createapp.preview", return_value={"ok": True}), patch("updates.install_update") as install, patch("sys.stdout", new_callable=StringIO) as stdout, patch("sys.stderr", new_callable=StringIO) as stderr:
+            main()
+        self.assertEqual(json.loads(stdout.getvalue()), {"ok": True})
+        self.assertIn("0.3.0 disponible", stderr.getvalue())
+        answer.assert_not_called()
+        install.assert_not_called()
+
+    def test_failed_install_keeps_original_command_available(self):
+        with patch("sys.argv", ["createapp", str(self.root)]), patch("sys.stdin.isatty", return_value=True), patch("builtins.input", return_value="s"), patch("createapp.check_for_updates", return_value=self.available), patch("updates.install_update", side_effect=OSError("download failed")), patch("terminal.run") as run, patch("sys.stderr", new_callable=StringIO) as stderr:
+            main()
+        run.assert_called_once()
+        self.assertIn("version actual", stderr.getvalue())
+
+    def test_posix_install_uses_pinned_release_and_cleans_up(self):
+        for platform in ("linux", "darwin"):
+            folder = self.root / "download"
+            folder.mkdir()
+            def verify_installer(command, **kwargs):
+                self.assertEqual(command[0], "sh")
+                self.assertEqual(Path(command[1]).read_bytes(), b"#!/bin/sh\nexit 0\n")
+                self.assertEqual(kwargs["env"]["CREATEAPP_VERSION"], "v0.3.0")
+                self.assertEqual(kwargs["env"]["CREATEAPP_REPO"], "Recamm/createapp")
+                self.assertEqual(kwargs["env"]["CREATEAPP_NO_LAUNCH"], "1")
+                self.assertEqual(kwargs["env"]["PYINSTALLER_RESET_ENVIRONMENT"], "1")
+                self.assertTrue(kwargs["check"])
+            with self.subTest(platform=platform), patch("updates.sys.platform", platform), patch("updates.tempfile.mkdtemp", return_value=str(folder)), patch("urllib.request.urlopen", return_value=BytesIO(b"#!/bin/sh\nexit 0\n")) as download, patch("updates.subprocess.run", side_effect=verify_installer) as run, patch("updates.subprocess.Popen") as launch:
+                install_update(self.available)
+            self.assertEqual(download.call_args.args[0].full_url, "https://github.com/Recamm/createapp/releases/download/v0.3.0/install.sh")
+            run.assert_called_once()
+            launch.assert_not_called()
+            self.assertFalse(folder.exists())
+
+    def test_windows_install_launches_worker_that_waits_for_current_process(self):
+        folder = self.root / "download"
+        folder.mkdir()
+        with patch("updates.sys.platform", "win32"), patch("updates.tempfile.mkdtemp", return_value=str(folder)), patch("urllib.request.urlopen", return_value=BytesIO(b"Write-Host 'fixture'")) as download, patch("updates.subprocess.Popen") as launch, patch("updates.subprocess.run") as run:
+            install_update(self.available)
+        self.assertEqual(download.call_args.args[0].full_url, "https://github.com/Recamm/createapp/releases/download/v0.3.0/install.ps1")
+        command = launch.call_args.args[0]
+        self.assertTrue(command[0].endswith("powershell.exe"))
+        self.assertEqual(command[1:3], ["-NoProfile", "-EncodedCommand"])
+        worker = base64.b64decode(command[3]).decode("utf-16le")
+        self.assertIn("Wait-Process", worker)
+        self.assertIn("CREATEAPP_UPDATE_PID", worker)
+        self.assertIn("-NoLaunch", worker)
+        self.assertIn("finally", worker)
+        self.assertIn("Remove-Item -LiteralPath", worker)
+        self.assertNotIn("ExecutionPolicy", worker)
+        environment = launch.call_args.kwargs["env"]
+        self.assertTrue(environment["CREATEAPP_UPDATE_PID"].isdigit())
+        self.assertEqual(environment["CREATEAPP_VERSION"], "v0.3.0")
+        self.assertEqual(Path(environment["CREATEAPP_UPDATE_SCRIPT"]).read_bytes(), b"Write-Host 'fixture'")
+        self.assertEqual(launch.call_args.kwargs["creationflags"], 0x00000010)
+        run.assert_not_called()
+
+    def test_failed_windows_launch_cleans_up_download(self):
+        folder = self.root / "download"
+        folder.mkdir()
+        with patch("updates.sys.platform", "win32"), patch("updates.tempfile.mkdtemp", return_value=str(folder)), patch("urllib.request.urlopen", return_value=BytesIO(b"fixture")), patch("updates.subprocess.Popen", side_effect=OSError("cannot launch")), self.assertRaises(OSError):
+            install_update(self.available)
+        self.assertFalse(folder.exists())
+
+    def test_failed_posix_installer_cleans_up_download(self):
+        folder = self.root / "download"
+        folder.mkdir()
+        with patch("updates.sys.platform", "linux"), patch("updates.tempfile.mkdtemp", return_value=str(folder)), patch("urllib.request.urlopen", return_value=BytesIO(b"fixture")), patch("updates.subprocess.run", side_effect=subprocess.CalledProcessError(1, ["sh"])), self.assertRaises(subprocess.CalledProcessError):
+            install_update(self.available)
+        self.assertFalse(folder.exists())
+
+    def test_invalid_installer_releases_are_rejected_before_download(self):
+        for changes in ({"tag": "v0.3.0;command"}, {"tag": "v0.4.0"}, {"tag": None}, {"status": "current"}):
+            with self.subTest(changes=changes), patch("urllib.request.urlopen") as download, self.assertRaises(ValueError):
+                install_update(dict(self.available, **changes))
+            download.assert_not_called()
+
+    def test_empty_or_oversized_installers_never_execute(self):
+        for payload in (b"", b" " * (128 * 1024 + 1)):
+            with self.subTest(size=len(payload)), patch("urllib.request.urlopen", return_value=BytesIO(payload)), patch("updates.subprocess.Popen") as launch, patch("updates.subprocess.run") as run, self.assertRaises(ValueError):
+                install_update(self.available)
+            launch.assert_not_called()
+            run.assert_not_called()
+
+    def test_doctor_prefetch_ux_search_and_invalid_commands_also_check(self):
+        current = dict(self.available, status="current")
+        for arguments in (["--doctor"], ["--prefetch"], ["--ux-search", "query"], ["--invalid-option"]):
+            with self.subTest(arguments=arguments), patch("sys.argv", ["createapp", str(self.root), *arguments]), patch("createapp.check_for_updates", return_value=current) as check, patch("doctor.inspect", return_value={}), patch("tooling.ux_search"), patch("createapp.LOCK", {"sources": {}}), patch("sys.stdout", new_callable=StringIO), patch("sys.stderr", new_callable=StringIO):
+                if arguments == ["--invalid-option"]:
+                    with self.assertRaises(SystemExit) as exit:
+                        main()
+                    self.assertEqual(exit.exception.code, 2)
+                else:
+                    main()
+                check.assert_called_once_with()
+
+    def test_help_version_and_json_commands_check_updates_every_time(self):
+        current = dict(self.available, status="current")
+        for argument in ("--help", "--version"):
+            with self.subTest(argument=argument), patch("sys.argv", ["createapp", argument]), patch("createapp.check_for_updates", return_value=current) as check, patch("sys.stdout", new_callable=StringIO), self.assertRaises(SystemExit) as exit:
+                main()
+            self.assertEqual(exit.exception.code, 0)
+            check.assert_called_once_with()
+        config = self.root / "config.json"
+        config.write_text(json.dumps(DEFAULTS), encoding="utf-8")
+        for argument, operation in (("--preview", "preview"), ("--apply", "initialize")):
+            with self.subTest(argument=argument), patch("sys.argv", ["createapp", str(self.root), argument, str(config)]), patch("createapp.check_for_updates", return_value=current) as check, patch("createapp." + operation, return_value={"ok": True}), patch("sys.stdout", new_callable=StringIO) as stdout, patch("sys.stderr", new_callable=StringIO) as stderr:
+                main()
+            check.assert_called_once_with()
+            self.assertEqual(json.loads(stdout.getvalue()), {"ok": True})
+            self.assertEqual(stderr.getvalue(), "")
 
 class ServerTests(unittest.TestCase):
     def setUp(self):

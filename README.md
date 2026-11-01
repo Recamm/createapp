@@ -33,6 +33,26 @@ El instalador selecciona el sistema/arquitectura, descarga el archivo de la rele
 
 También podés descargar un archivo de release y extraerlo manualmente. No hay instalación permanente obligatoria: el ejecutable se puede usar desde esa carpeta.
 
+## Actualizaciones
+
+Cada ejecución de CreateApp comprueba si hay una release pública estable más nueva de `Recamm/createapp`, antes de procesar cualquier comando. Incluye `--help`, `--version`, `--doctor`, `--preview`, `--apply`, `--prefetch`, `--ux-search`, el menú y `--ui`. No usa caché: consulta de nuevo en la siguiente ejecución aunque se haya rechazado una actualización.
+
+Primero comprueba si puede conectar con GitHub o el proxy HTTPS configurado, con timeout de conexión de 1 segundo. Si falla, no consulta releases ni muestra avisos. Si hay conexión, consulta la API con timeout de red de 2 segundos. Los fallos, límites de la API y ausencia de una versión nueva son silenciosos; continúa el comando original. No se envía el contenido del proyecto.
+
+Cuando hay una versión nueva, muestra el aviso y pregunta en la terminal `Actualizar la instalacion de usuario ahora? [s/N]`. Enter o una respuesta negativa continúa con el comando original. Ctrl+C cancela el comando completo. Solo una respuesta afirmativa autoriza descargar y ejecutar el instalador de la versión ofrecida; ese instalador verifica el SHA-256 del paquete antes de reemplazarlo.
+
+En Windows abre un actualizador en otra ventana que espera a que termine el proceso actual, para no reemplazar un ejecutable en uso. Cerrá también otras instancias de CreateApp. En Linux/macOS ejecuta el instalador y espera su resultado. Tras actualizar, volvé a ejecutar el comando original. Si la descarga o el inicio del instalador falla, continúa con la versión actual e informa el problema; en Windows, los errores posteriores se muestran en la ventana del actualizador.
+
+Los avisos y la confirmación van a stderr para conservar la salida JSON de los comandos. Sin entrada interactiva, avisa si hay una versión nueva, pero no pregunta, no consume stdin ni instala: continúa el comando original. Para consultar y, si corresponde, ofrecer la actualización sin ejecutar otra operación:
+
+```sh
+createapp --check-updates
+```
+
+Sin actualización o conexión, este comando no imprime nada. No hay opciones ni variables de entorno para omitir el verificador. La instalación actualiza la ubicación de usuario del instalador, no el checkout del código fuente ni copias portables en otras carpetas. También se puede repetir manualmente el comando de instalación de cada sistema.
+
+El aviso requiere que la nueva versión esté publicada, no en borrador; actualizar el ejecutable no modifica las configuraciones `.createapp` de proyectos existentes. Los dispositivos con un ejecutable anterior al verificador necesitan una primera actualización manual.
+
 ## Uso
 
 Terminal, preguntando la carpeta:

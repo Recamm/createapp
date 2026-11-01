@@ -17,6 +17,7 @@ import webbrowser
 from catalog import AGENTS, DEFAULTS, PACKS, ROLES
 from runtime import VERSION, cache_dir, project_defaults
 from engine import ConfigError, HERE, LOCK, fetch_blob, initialize, preview, detect_stack
+from updates import check_for_updates, offer_update
 
 class AppServer(ThreadingHTTPServer):
     daemon_threads = True
@@ -105,12 +106,15 @@ class Handler(BaseHTTPRequestHandler):
             self.send(400, {"error": str(exc)})
 
 def main():
+    if offer_update(check_for_updates()):
+        return
     p = argparse.ArgumentParser(description="CreateApp: configurar skills y reglas de un proyecto existente. Terminal por defecto; --ui abre el navegador.")
     p.add_argument("project", nargs="?", type=Path, help="Carpeta del proyecto existente; si se omite se pregunta en terminal.")
     p.add_argument("--workspace", type=Path, help=argparse.SUPPRESS)
     p.add_argument("--ui", action="store_true", help="Abrir la interfaz opcional de navegador.")
     p.add_argument("--doctor", action="store_true", help="Mostrar requisitos de las herramientas seleccionadas, sin instalar nada.")
     p.add_argument("--version", action="version", version="CreateApp " + VERSION)
+    p.add_argument("--check-updates", action="store_true", help="Comprobar si hay una actualización y ofrecer instalarla.")
     p.add_argument("--ux-search", nargs=argparse.REMAINDER, help="Ejecutar el buscador UI/UX seleccionado con el runtime incluido. Debe ser la última opción.")
     p.add_argument("--port", type=int, default=0, help="Puerto local; 0 elige uno libre.")
     p.add_argument("--no-browser", action="store_true", help="Mostrar la URL sin abrir el navegador.")
@@ -121,6 +125,8 @@ def main():
     args = p.parse_args()
     project = (args.workspace or args.project or Path.cwd()).expanduser().resolve()
     try:
+        if args.check_updates:
+            return
         if not project.is_dir(): raise ConfigError("La carpeta del proyecto debe existir.")
         if args.ux_search is not None:
             from tooling import ux_search
@@ -144,9 +150,9 @@ def main():
             result = initialize(raw, project, args.cache, print) if args.apply else preview(raw, project)
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return
+        if not args.ui and not sys.stdin.isatty():
+            raise ConfigError("Usá una terminal interactiva, --ui para navegador o --preview/--apply con un JSON.")
         if not args.ui:
-            if not sys.stdin.isatty():
-                raise ConfigError("Usá una terminal interactiva, --ui para navegador o --preview/--apply con un JSON.")
             from terminal import run
             run(args.project or args.workspace, args.cache)
             return

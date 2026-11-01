@@ -9,6 +9,8 @@ El instalador de un comando requiere una release pública accesible sin login. E
 5. Revisar los cinco builds y sus smoke tests. Publicar el borrador desde [Releases](https://github.com/Recamm/createapp/releases) para habilitar `/releases/latest/download/`.
 6. Para la siguiente release, incrementar `runtime.VERSION` y subir el cambio. Las releases existentes, incluso borradores, no se modifican automáticamente; los builds posteriores de la misma versión quedan como artifacts en Actions.
 
+Las versiones que incluyen el verificador comprueban conectividad y consultan `/repos/Recamm/createapp/releases/latest` en cada ejecución de cualquier comando, sin caché ni exclusiones. Solo comparan versiones estables con formato `X.Y.Z` o tag `vX.Y.Z`; no anuncian borradores ni prereleases. Sin conexión o sin una versión nueva, continúan sin avisos. Si hay una actualización y la entrada es interactiva, preguntan antes de descargar el instalador de esa release exacta. La instalación usa los checksums habituales y nunca se ejecuta sin consentimiento. En Windows, un proceso auxiliar espera el cierre del ejecutable antes de reemplazarlo. `createapp --check-updates` realiza el mismo flujo sin otra operación. Los ejecutables anteriores al verificador necesitan una primera actualización manual para incorporarlo.
+
 ## Targets
 
 | Target | Runner | Formato |
