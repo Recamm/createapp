@@ -63,6 +63,23 @@ def main():
                 assert (project / '.createapp/vendor' / repo / path).is_file(), (repo, path)
         subprocess.run([str(binary), str(project), '--ux-search', 'minimal productivity', '--design-system', '-f', 'markdown'], env=env, stdout=subprocess.DEVNULL, check=True)
         subprocess.run([str(binary), str(project), '--doctor'], env=env, check=True)
+        additive = temp / 'additive-project'
+        additive.mkdir()
+        cfg.write_text(json.dumps(dict(DEFAULTS, skills=['workflow'])), encoding='utf-8')
+        subprocess.run([str(binary), str(additive), '--apply', str(cfg)], env=env, stdout=subprocess.DEVNULL, check=True)
+        preserved = {name: (additive / name).read_bytes() for name in ('AGENTS.md', '.agents/skills/ca-workflow/SKILL.md', '.createapp/POLICY.md')}
+        original_lock = json.loads((additive / '.createapp/sources.lock.json').read_text(encoding='utf-8'))
+        command = [str(binary), str(additive), '--add-skills', 'ux', 'find-skills']
+        plan = json.loads(subprocess.check_output([*command, '--dry-run'], env=env, text=True))
+        assert plan['roles'] == ['find-skills', 'ux']
+        result = json.loads(subprocess.check_output(command, env=env, text=True))
+        assert result['roles'] == 2
+        for name, data in preserved.items():
+            current = (additive / name).read_bytes()
+            assert current.startswith(data) if name.endswith('POLICY.md') else current == data, name
+        assert json.loads((additive / '.createapp/sources.lock.json').read_text(encoding='utf-8'))['sources'] == original_lock['sources']
+        assert json.loads(subprocess.check_output(command, env=env, text=True))['roles'] == 0
+        subprocess.run([str(binary), str(additive), '--ux-search', 'minimal productivity', '--design-system', '-f', 'markdown'], env=env, stdout=subprocess.DEVNULL, check=True)
         content = temp / 'package'
         content.mkdir()
         shutil.copy2(binary, content / binary.name)

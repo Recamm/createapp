@@ -1,6 +1,7 @@
 // Run against a temporary workspace: node tests/ui-smoke.cjs URL_WITH_TOKEN
 const assert = require('node:assert/strict');
 const path = require('node:path');
+const os = require('node:os');
 const moduleRoot = process.env.CREATEAPP_PLAYWRIGHT_ROOT || process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES;
 const {chromium, webkit} = require(moduleRoot ? path.join(moduleRoot, 'playwright') : 'playwright');
 
@@ -36,7 +37,7 @@ const {chromium, webkit} = require(moduleRoot ? path.join(moduleRoot, 'playwrigh
   await page.locator('#edit-button').click();
   await page.locator('label').filter({has:page.locator('[name=pack][value=impeccable]')}).click();
   await page.locator('label').filter({has:page.locator('[name=pack][value=find-skills]')}).click();
-  await page.screenshot({path:'/tmp/createapp-desktop.png',fullPage:true});
+  await page.screenshot({path:path.join(os.tmpdir(),'createapp-desktop.png'),fullPage:true});
   await page.locator('[name=coordinator]').selectOption('matt');
   assert.equal(await page.locator('[name=pack][value=matt]').isChecked(),true);
   await page.locator('#preview-button').click();
@@ -69,8 +70,27 @@ const {chromium, webkit} = require(moduleRoot ? path.join(moduleRoot, 'playwrigh
   await page.locator('#create-button').click();
   await page.locator('#progress-title').filter({hasText:'Tu proyecto está preparado.'}).waitFor({timeout:180000});
   const target=await page.locator('#progress-message').innerText();
+  await page.locator('#another-button').click();
+  await page.locator('#additions').waitFor({state:'visible'});
+  const missing=await page.locator('[name=add_skill]').evaluateAll(inputs=>inputs.map(input=>input.value));
+  assert.ok(missing.includes('debug'));
+  assert.ok(missing.includes('find-skills'));
+  assert.ok(!missing.includes('workflow'));
+  assert.equal(await page.locator('[name=add_skill]:checked').count(),0);
+  assert.equal(await page.locator('#project').isVisible(),false);
+  await page.locator('[name=add_skill][value=debug]').check();
+  await page.locator('[name=add_skill][value=find-skills]').check();
+  await page.locator('#preview-button').click();
+  await page.locator('#review').waitFor({state:'visible'});
+  assert.deepEqual((await page.locator('#review-roles').innerText()).split('\n'),['ca-debug','ca-find-skills']);
+  await page.locator('#create-button').click();
+  await page.locator('#progress-title').filter({hasText:'Tu proyecto está preparado.'}).waitFor({timeout:180000});
+  await page.locator('#another-button').click();
+  await page.locator('#additions').waitFor({state:'visible'});
+  assert.equal(await page.locator('[name=add_skill][value=debug]').count(),0);
+  assert.equal(await page.locator('[name=add_skill][value=find-skills]').count(),0);
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('Chromium: form, presets, optional Matt, stack scoping and real project generation passed.');
+  console.log('Chromium: initial configuration, missing-skill selection, incremental apply and repeated inventory passed.');
   console.log('Generated project:',target);
   await browser.close();
   // Opt into WebKit when its OS dependencies are available; neither engine is a real iPhone.
@@ -78,14 +98,13 @@ const {chromium, webkit} = require(moduleRoot ? path.join(moduleRoot, 'playwrigh
   const mobileBrowser=await mobileEngine.launch({headless:true});
   const mobile=await mobileBrowser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2});
   await mobile.goto(url);
-  // A completed job is displayed after refresh. Return to the form.
-  await mobile.locator('#another-button').waitFor({state:'visible'});
-  await mobile.locator('#another-button').click();
-  await mobile.locator('#layout').waitFor({state:'visible'});
+  await mobile.locator('#additions').waitFor({state:'visible'});
   assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
-  await mobile.screenshot({path:'/tmp/createapp-mobile.png',fullPage:true});
-  await mobile.locator('[name=goal]').fill('Interfaz móvil');
-  assert.equal(await mobile.locator('[name=goal]').inputValue(),'Interfaz móvil');
+  await mobile.screenshot({path:path.join(os.tmpdir(),'createapp-mobile.png'),fullPage:true});
+  await mobile.locator('[name=add_skill][value=impeccable]').check();
+  await mobile.locator('#preview-button').click();
+  await mobile.locator('#review').waitFor({state:'visible'});
+  assert.equal(await mobile.locator('#review-roles').innerText(),'ca-impeccable');
   console.log((process.env.CREATEAPP_TEST_WEBKIT==='1'?'WebKit':'Chromium')+': 390px layout and form interaction passed.');
   await mobileBrowser.close();
 })().catch(e=>{console.error(e);process.exit(1)});

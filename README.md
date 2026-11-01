@@ -150,7 +150,22 @@ Estas instrucciones reducen solapamientos; no garantizan obediencia de un LLM ni
 
 Las instrucciones existentes se conservan y se les agrega el bloque CreateApp. El código de tu app, package.json, dependencias, README y guía propia no se modifican. Los archivos de configuración en conflicto detienen la operación.
 
-Esta versión hace la **primera configuración**. No reemplaza una instalación `.createapp` existente. Para cambiar una selección, generá en una copia del proyecto y compará sus archivos; editar config.json por sí solo no reinstala perfiles. No hay actualizaciones automáticas.
+### Agregar skills sin reinstalar
+
+Volvé a ejecutar `createapp` dentro de un proyecto ya configurado. Detecta los perfiles `ca-*` instalados y muestra **solo las skills faltantes compatibles** con el stack y coordinador actuales, incluidas las incorporadas al catálogo y las que antes dejaste sin seleccionar. Ninguna viene marcada: elegí las que quieras agregar y confirmá la vista previa. `createapp --ui` ofrece el mismo modo en el navegador.
+
+También podés indicar skills individuales por su identificador, sin el prefijo `ca-`:
+
+```sh
+createapp . --add-skills impeccable find-skills --dry-run
+createapp . --add-skills impeccable find-skills
+```
+
+El segundo comando autoriza directamente el agregado. Las skills ya instaladas se omiten; repetirlo no las reinstala. Sin selección o al cancelar, no se escribe nada.
+
+Se conservan los perfiles existentes, instrucciones propias, fuentes fijadas y decisiones de coordinación, autonomía y diseño. Solo se actualiza el registro de selección y se agrega al contrato la lista de nuevos perfiles. Sus fuentes quedan aisladas en `.createapp/additions/` para no superponer versiones de un mismo proveedor. Un fallo de preparación no deja una instalación parcial.
+
+Este modo **no actualiza ni elimina skills instaladas**, no cambia el stack/coordinador y no migra plugins ajenos a CreateApp. No repara automáticamente copias faltantes para otro asistente si el perfil ya existe en alguno de los asistentes configurados. Editar config.json por sí solo tampoco reinstala perfiles. `--apply` y `--preview CONFIG.json` siguen reservados para la primera configuración; actualizar el ejecutable permite descubrir el catálogo nuevo sin modificar por sí solo los proyectos.
 
 ## Funciones sin Python externo y herramientas opcionales
 

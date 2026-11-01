@@ -80,19 +80,19 @@ Antes de trabajar, leer `.createapp/POLICY.md`. Ese archivo expresa la selecció
 <!-- createapp:end -->
 """
 
-def wrapper(name, data, config):
+def wrapper(name, data, config, *, vendor_root=".createapp/vendor"):
     _, repo, paths, description = data
-    refs = "\n".join(f"- `.createapp/vendor/{repo}/{p}`" for p in paths)
+    refs = "\n".join(f"- `{vendor_root}/{repo}/{p}`" for p in paths)
     manual = name in ("handoff", "module-design", "graph", "composition", "web-review", "impeccable", "find-skills")
     front = f"---\nname: ca-{name}\ndescription: {json.dumps(description, ensure_ascii=False)}\n"
     if manual: front += "disable-model-invocation: true\n"
     note = ""
     if name == "ux":
-        base = f".createapp/vendor/{repo}/.claude/skills/ui-ux-pro-max"
+        base = f"{vendor_root}/{repo}/.claude/skills/ui-ux-pro-max"
         note = f"\nEl ejecutable CreateApp incluye Python para este buscador: desde el proyecto, usar `createapp . --ux-search \"consulta breve\" --design-system`. Si trabajás desde el código fuente, también sirve `python \"{base}/scripts/search.py\" \"consulta breve\" --design-system`. No asumir CLAUDE_PLUGIN_ROOT: esta instalación no es un plugin.\n"
     if name == "graph": note = "\nPrimero ejecutar manualmente `python .createapp/setup_graphify.py`. La herramienta queda en `.createapp/tools/graphify/`; no ejecutar `graphify install`, ya que registraría un segundo perfil fuera de esta configuración. Consultar su `--help` y la fuente fijada para elegir el comando.\n"
     if name == "impeccable":
-        base = f".createapp/vendor/{repo}/.agents/skills/impeccable"
+        base = f"{vendor_root}/{repo}/.agents/skills/impeccable"
         note = f"\nIntegración de consulta sin motor ni launcher. Leer PRODUCT.md y DESIGN.md existentes directamente; no exigir init ni otra entrevista para refinar una interfaz. Resolver las referencias relativas desde `{base}/`. Consultar `reference/craft-floor.md` antes de editar UI y solo la guía pertinente, por ejemplo `reference/critique.md`, `reference/audit.md` o `reference/polish.md`.\nNo ejecutar `impeccable context`, instalar o descargar binarios, activar hooks, crear atajos con pin ni contactar el catálogo remoto. El detector y los modos live/generate requieren una instalación oficial separada y autorización explícita; no están incluidos en este perfil. Usar las herramientas de navegador disponibles para verificar el resultado, sin afirmar que se ejecutó el detector.\n"
     if name == "find-skills":
         note = "\nConsultar primero skills.sh con las herramientas web disponibles. Para búsquedas CLI, `npx skills find` requiere Node.js/npm y conexión; CreateApp no instala esas herramientas ni el CLI. No ejecutar búsquedas en cada tarea ni enviar código privado o secretos.\nRevisar el SKILL.md, los scripts y la licencia de cada candidato antes de recomendarlo; popularidad no garantiza seguridad. Presentar origen, utilidad y límites sin inventar métricas. No ejecutar `npx skills add`, `npx skills update` ni `npx skills init` sin autorización explícita sobre origen y alcance local/global. No usar `-g -y` por defecto. Las nuevas skills no se consideran fuentes revisadas de CreateApp ni reemplazan su contrato.\n"

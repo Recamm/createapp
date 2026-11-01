@@ -8,6 +8,7 @@
     <div id="fatal" class="alert error" hidden role="alert"></div>
     <div class="layout" id="layout" hidden>
       <form id="config-form" class="form-column">
+        <section class="panel" id="additions" hidden><div class="section-heading"><span class="step">+</span><div><h2>Agregar skills</h2><p id="installation-summary"></p></div></div><div id="available-skills"></div><p id="additions-empty" class="muted" hidden>No hay skills nuevas disponibles para este proyecto.</p></section>
         <section class="panel" id="project"><div class="section-heading"><span class="step">1</span><div><h2>El proyecto</h2><p>Agregá skills y reglas; el código y las dependencias se conservan.</p></div></div>
           <div class="grid2"><label>Nombre del proyecto<input name="name" required pattern="[a-z0-9][a-z0-9\-]{0,59}" maxlength="60" autocomplete="off" placeholder="mi-app"><small>Minúsculas, números y guiones.</small></label><label>Asistente<select name="agent"></select><small>Usa tu asistente instalado; no instala modelos.</small></label></div>
           <label>Carpeta del proyecto<input name="directory" required autocomplete="off"><small id="workspace"></small></label>

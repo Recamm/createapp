@@ -202,6 +202,26 @@ class EngineTests(unittest.TestCase):
         with patch("urllib.request.urlopen", return_value=Response()), self.assertRaises(ConfigError):
             fetch_blob("owner/repo", {"commit":"a"*40}, entry, self.root / "cache")
 
+    def test_incremental_skills_preserve_existing_installation(self):
+        from engine import installation, preview_additions, install_additions
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        original_rules = (target / "AGENTS.md").read_bytes()
+        original_policy = (target / ".createapp/POLICY.md").read_bytes()
+        original_skill = (target / ".agents/skills/ca-workflow/SKILL.md").read_bytes()
+        state = installation(target)
+        self.assertIn("workflow", state["installed"])
+        self.assertIn("find-skills", state["available"])
+        planned = preview_additions(["find-skills"], target)
+        self.assertEqual(planned["roles"], ["find-skills"])
+        install_additions(["find-skills"], target, fetcher=self.fake)
+        self.assertEqual((target / "AGENTS.md").read_bytes(), original_rules)
+        self.assertTrue((target / ".createapp/POLICY.md").read_bytes().startswith(original_policy))
+        self.assertEqual((target / ".agents/skills/ca-workflow/SKILL.md").read_bytes(), original_skill)
+        self.assertTrue((target / ".agents/skills/ca-find-skills/SKILL.md").is_file())
+        self.assertNotIn("find-skills", installation(target)["available"])
+        self.assertEqual(preview_additions(["find-skills"], target)["roles"], [])
+
     def test_complete_project_and_no_reinstall(self):
         result = initialize(self.config, self.root, fetcher=self.fake)
         target = Path(result["target"])
@@ -215,6 +235,129 @@ class EngineTests(unittest.TestCase):
         self.assertFalse((target / "node_modules").exists())
         self.assertFalse((target / ".git").exists())
         with self.assertRaises(ConfigError): initialize(self.config, self.root, fetcher=self.fake)
+
+    def test_incremental_download_failure_changes_nothing(self):
+        from engine import install_additions
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        before = {path.relative_to(target): path.read_bytes() for path in target.rglob("*") if path.is_file()}
+        with self.assertRaises(OSError):
+            install_additions(["impeccable"], target, fetcher=lambda *args: (_ for _ in ()).throw(OSError("offline")))
+        after = {path.relative_to(target): path.read_bytes() for path in target.rglob("*") if path.is_file()}
+        self.assertEqual(after, before)
+
+    def test_incremental_detects_policy_changes_during_preparation(self):
+        from engine import install_additions
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        policy_path = target / ".createapp/POLICY.md"
+        def edited(repo, source, entry, cache):
+            policy_path.write_text("user changed policy", encoding="utf-8")
+            return self.fake(repo, source, entry, cache)
+        with self.assertRaises(ConfigError): install_additions(["find-skills"], target, fetcher=edited)
+        self.assertEqual(policy_path.read_text(), "user changed policy")
+        self.assertFalse((target / ".agents/skills/ca-find-skills").exists())
+
+    def test_incremental_preserves_old_sources_when_provider_commit_changes(self):
+        from engine import LOCK, install_additions, installation
+        self.config["skills"] = ["workflow", "visual"]
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        repo = "anthropics/skills"
+        previous = json.loads((target / ".createapp/sources.lock.json").read_text(encoding="utf-8"))["sources"][repo]
+        vendor = target / ".createapp/vendor" / repo
+        original_files = {path.relative_to(vendor): path.read_bytes() for path in vendor.rglob("*") if path.is_file()}
+        newer = copy.deepcopy(LOCK)
+        newer["sources"][repo]["commit"] = "a" * 40
+        with patch("engine.LOCK", newer):
+            install_additions(["browser-test"], target, fetcher=self.fake)
+        lock = json.loads((target / ".createapp/sources.lock.json").read_text(encoding="utf-8"))
+        self.assertEqual(lock["sources"][repo], previous)
+        for path, data in original_files.items(): self.assertEqual((vendor / path).read_bytes(), data)
+        snapshot = lock["additions"][0]["sources_lock"]
+        self.assertEqual(json.loads((target / snapshot).read_text(encoding="utf-8"))["sources"][repo]["commit"], "a" * 40)
+        wrapper_text = (target / ".agents/skills/ca-browser-test/SKILL.md").read_text(encoding="utf-8")
+        self.assertIn(".createapp/additions/", wrapper_text)
+        self.assertNotIn("browser-test", installation(target)["available"])
+
+    def test_incremental_preserves_agents_and_never_switches_coordinator(self):
+        from engine import installation, install_additions, preview_additions
+        self.config["agents"] = ["copilot", "claude"]
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        state = installation(target)
+        self.assertNotIn("matt-workflow", state["available"])
+        with self.assertRaises(ConfigError): preview_additions(["matt-workflow"], target)
+        with self.assertRaises(ConfigError): preview_additions(["missing-skill"], target)
+        install_additions(["impeccable"], target, fetcher=self.fake)
+        for root in (".agents/skills", ".claude/skills"):
+            self.assertTrue((target / root / "ca-impeccable/SKILL.md").is_file())
+        self.assertEqual(installation(target)["config"]["coordinator"], "superpowers")
+
+    def test_incremental_no_selection_is_a_noop(self):
+        from engine import install_additions
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        before = (target / ".createapp/config.json").read_bytes()
+        result = install_additions([], target, fetcher=lambda *args: self.fail("No downloads expected"))
+        self.assertEqual(result["roles"], 0)
+        self.assertEqual((target / ".createapp/config.json").read_bytes(), before)
+        self.assertFalse((target / ".createapp/additions").exists())
+
+    def test_incremental_rejects_changes_after_confirmation(self):
+        from engine import install_additions, preview_additions
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        planned = preview_additions(["find-skills"], target)
+        policy_path = target / ".createapp/POLICY.md"
+        policy_path.write_bytes(policy_path.read_bytes() + b"\nUser decision\n")
+        with self.assertRaises(ConfigError):
+            install_additions(["find-skills"], target, fetcher=self.fake, expected_hash=planned["config_hash"])
+        self.assertFalse((target / ".agents/skills/ca-find-skills").exists())
+
+    def test_incremental_rolls_back_write_failure(self):
+        from engine import install_additions
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        before = {path.relative_to(target): path.read_bytes() for path in target.rglob("*") if path.is_file()}
+        import os
+        replace = os.replace
+        def fail_on_config(source, destination):
+            if Path(destination) == target / ".createapp/config.json": raise OSError("write failed")
+            return replace(source, destination)
+        with patch("engine.os.replace", side_effect=fail_on_config), self.assertRaises(OSError):
+            install_additions(["find-skills"], target, fetcher=self.fake)
+        after = {path.relative_to(target): path.read_bytes() for path in target.rglob("*") if path.is_file()}
+        self.assertEqual(after, before)
+
+    def test_incremental_terminal_offers_only_missing_skills_and_can_cancel(self):
+        from terminal import run
+        initialize(self.config, self.root, fetcher=self.fake)
+        target = self.root / "mi-app"
+        before = (target / ".createapp/config.json").read_bytes()
+        class Prompts:
+            def ask(inner, kind, message, choices=None, default=None):
+                if kind == "multi":
+                    available = {name for name, label in choices}
+                    self.assertNotIn("workflow", available)
+                    self.assertIn("find-skills", available)
+                    self.assertEqual(default, [])
+                    return ["find-skills"]
+                self.assertEqual(kind, "confirm")
+                return False
+        with patch("sys.stdout", new_callable=StringIO): self.assertIsNone(run(target, prompts=Prompts()))
+        self.assertEqual((target / ".createapp/config.json").read_bytes(), before)
+
+    def test_incremental_ux_search_finds_added_sources_offline(self):
+        from engine import install_additions
+        from tooling import ux_search
+        self.config.update(packs=[], coordinator="simple", vercel_react=False, vercel_web=False)
+        target = self.root / "mi-app"
+        with patch("urllib.request.urlopen", side_effect=AssertionError("offline")), patch("sys.stdout", new_callable=StringIO) as stdout:
+            initialize(self.config, self.root)
+            install_additions(["ux"], target)
+            ux_search(target, ["minimal productivity", "--design-system", "-f", "markdown"])
+        self.assertTrue(stdout.getvalue())
 
     def test_policy_changes_with_choices(self):
         self.config.update(autonomy="autonomous",testing="strict",parallel=True,design="existing")
@@ -505,6 +648,18 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(cm.exception.code,403)
         with self.assertRaises(urllib.error.HTTPError) as cm: self.request("/api/preview",{},origin="https://example.com")
         self.assertEqual(cm.exception.code,403)
+
+    def test_incremental_catalog_preview_and_stale_request(self):
+        initialize(DEFAULTS, self.server.workspace, fetcher=lambda *args: b"fixture")
+        with self.request("/api/catalog") as response: catalog = json.load(response)
+        self.assertIn("workflow", catalog["installation"]["installed"])
+        self.assertIn("find-skills", catalog["installation"]["available"])
+        with self.request("/api/additions/preview", {"skills": ["find-skills"]}) as response: planned = json.load(response)
+        self.assertEqual(planned["roles"], ["find-skills"])
+        with self.assertRaises(urllib.error.HTTPError) as error:
+            self.request("/api/additions/initialize", {"skills": ["find-skills"], "config_hash": "stale"})
+        self.assertEqual(error.exception.code, 400)
+        self.assertFalse((self.server.workspace / ".agents/skills/ca-find-skills").exists())
 
     def test_preview_and_stale_hash_never_writes(self):
         with self.request("/api/preview",DEFAULTS) as res: p=json.load(res)

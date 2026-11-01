@@ -1,5 +1,19 @@
 # Validación de CreateApp
 
+## 0.2.2: skills incrementales en Windows
+
+Fecha: 1 de noviembre de 2026.
+
+- 64 pruebas ejecutadas: 61 aprobadas y 3 omitidas (enlaces simbólicos no disponibles y dos pruebas del instalador POSIX).
+- Detección de perfiles instalados; selección exclusivamente de skills faltantes compatibles, sin cambiar asistentes ni coordinador. Menú, API autenticada y CLI con `--add-skills` y `--dry-run`.
+- Conservación de perfiles, instrucciones, política anterior y versiones de fuentes. Las fuentes agregadas se guardan en snapshots separados; prueba con un commit nuevo del mismo proveedor sin reemplazar el anterior.
+- Cancelación y selección vacía sin escrituras. Repetición sin reinstalación. Fallos de descarga y escritura con rollback; rechazo de cambios entre vista previa, confirmación y preparación.
+- Navegador integrado Chromium sobre un proyecto temporal: primera configuración sin Debug, reapertura con solo faltantes, agregado real de Debug y Find Skills, reapertura sin ofrecerlas de nuevo. Vista a 390 px sin desbordamiento horizontal.
+- Compilación Windows x64 con PyInstaller 6.22.3 y Python 3.11.9. Smoke del binario con PATH vacío: primera configuración, vista previa incremental, agregado de UX y Find Skills, preservación de archivos y fuentes previas, repetición con cero agregados y buscador UX desde el snapshot nuevo.
+- Paquete local verificado por SHA-256 e instalación de 0.2.2 conservando un respaldo del ejecutable anterior. Sin Python ni Node externos para configurar o agregar skills.
+
+Pendiente: publicar una release pública 0.2.2 para distribuir el catálogo y esta función a otros equipos. No se hicieron commit, push ni publicación. Los demás sistemas requieren sus runners nativos. La prueba de navegador fue en Chromium integrado, no Safari/iPhone real; el script completo de smoke de navegador se actualizó, pero no se ejecutó aquí como proceso independiente.
+
 ## 0.2.1: verificación local en Windows
 
 Fecha: 1 de noviembre de 2026.
@@ -13,7 +27,7 @@ Fecha: 1 de noviembre de 2026.
 - Interfaz del ejecutable instalado: nueve paquetes disponibles; Impeccable y Find Skills son opcionales y ambos perfiles aparecen en la vista previa al seleccionarlos, sin aplicar cambios al repositorio.
 - Corrección de la validación HTML del nombre para navegadores con expresiones regulares en modo Unicode v; acepta nombres con guiones y rechaza caracteres fuera del formato admitido.
 
-Pendiente para distribuir esta versión: subir los cambios, ejecutar los cinco builds y publicar la release 0.2.1. El paquete local no reemplaza la release pública. El reemplazo mediante el actualizador interactivo se cubrió con mocks, no con una actualización automática real; los demás sistemas requieren sus runners nativos.
+El paquete local no reemplazó la release pública. El reemplazo mediante el actualizador interactivo se cubrió con mocks, no con una actualización automática real; los demás sistemas requieren sus runners nativos.
 
 ## 0.2.0: registro histórico
 

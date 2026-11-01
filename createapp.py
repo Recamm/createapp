@@ -16,7 +16,7 @@ import webbrowser
 
 from catalog import AGENTS, DEFAULTS, PACKS, ROLES
 from runtime import VERSION, cache_dir, project_defaults
-from engine import ConfigError, HERE, LOCK, fetch_blob, initialize, preview, detect_stack
+from engine import ConfigError, HERE, LOCK, fetch_blob, initialize, preview, detect_stack, installation, preview_additions, install_additions
 from updates import check_for_updates, offer_update
 
 class AppServer(ThreadingHTTPServer):
@@ -34,11 +34,14 @@ class AppServer(ThreadingHTTPServer):
     def base_url(self):
         return f"http://127.0.0.1:{self.server_port}"
 
-    def generate(self, config):
+    def generate(self, config, incremental=False, expected_hash=None):
         def progress(message):
             with self.job_lock: self.job["messages"].append(message)
         try:
-            result = initialize(config, self.workspace, self.cache, progress)
+            if incremental:
+                result = install_additions(config, self.workspace, self.cache, progress, expected_hash=expected_hash)
+            else:
+                result = initialize(config, self.workspace, self.cache, progress)
             with self.job_lock: self.job.update(state="done", result=result)
         except Exception as exc:
             with self.job_lock: self.job.update(state="error", error=str(exc))
@@ -75,7 +78,11 @@ class Handler(BaseHTTPRequestHandler):
             return
         if not self.authorized(): self.send(403, {"error": "Abrí la dirección completa que muestra la terminal para autorizar esta sesión local."}); return
         if path == "/api/catalog":
-            self.send(200, {"defaults": project_defaults(self.server.workspace), "packs": PACKS, "agents": AGENTS, "detected_stack": detect_stack(self.server.workspace), "skills": {name: {"pack": data[0], "description": data[3]} for name, data in ROLES.items()}, "workspace": str(self.server.workspace), "reviewed": LOCK["reviewed"]})
+            try:
+                state = installation(self.server.workspace)
+                self.send(200, {"defaults": state["config"] if state else project_defaults(self.server.workspace), "installation": state, "packs": PACKS, "agents": AGENTS, "detected_stack": detect_stack(self.server.workspace), "skills": {name: {"pack": data[0], "description": data[3]} for name, data in ROLES.items()}, "workspace": str(self.server.workspace), "reviewed": LOCK["reviewed"]})
+            except (ConfigError, ValueError, OSError) as exc:
+                self.send(400, {"error": str(exc)})
         elif path == "/api/status":
             with self.server.job_lock: state = copy.deepcopy(self.server.job)
             self.send(200, state)
@@ -92,14 +99,19 @@ class Handler(BaseHTTPRequestHandler):
             path = urllib.parse.urlsplit(self.path).path
             if path == "/api/preview":
                 self.send(200, preview(body, self.server.workspace))
-            elif path == "/api/initialize":
-                p = preview(body.get("config"), self.server.workspace)
+            elif path == "/api/additions/preview":
+                self.send(200, preview_additions(body.get("skills"), self.server.workspace))
+            elif path in ("/api/initialize", "/api/additions/initialize"):
+                incremental = path == "/api/additions/initialize"
+                p = preview_additions(body.get("skills"), self.server.workspace) if incremental else preview(body.get("config"), self.server.workspace)
                 if p["config_hash"] != body.get("config_hash"): raise ConfigError("La configuración cambió. Actualizá la vista previa.")
                 if p["conflicts"]: raise ConfigError("Hay conflictos con archivos existentes.")
+                if incremental and not p["roles"]: raise ConfigError("Seleccioná al menos una skill nueva.")
                 with self.server.job_lock:
                     if self.server.job["state"] == "running": raise ConfigError("Ya hay una generación en curso.")
                     self.server.job = {"state": "running", "messages": ["Preparando el proyecto…"]}
-                threading.Thread(target=self.server.generate, args=(p["config"],), daemon=True).start()
+                selection = p["skills"] if incremental else p["config"]
+                threading.Thread(target=self.server.generate, args=(selection, incremental, p["config_hash"]), daemon=True).start()
                 self.send(202, {"state": "running"})
             else: self.send(404, {"error": "Ruta no encontrada."})
         except (ConfigError, ValueError, TypeError, OSError) as exc:
@@ -120,6 +132,8 @@ def main():
     p.add_argument("--no-browser", action="store_true", help="Mostrar la URL sin abrir el navegador.")
     p.add_argument("--apply", type=Path, metavar="CONFIG.json", help="Generar directamente desde una configuración exportada.")
     p.add_argument("--preview", type=Path, metavar="CONFIG.json", help="Mostrar el plan sin escribir el proyecto.")
+    p.add_argument("--add-skills", nargs="+", choices=sorted(ROLES), metavar="SKILL", help="Agregar solo las skills indicadas a un proyecto ya configurado.")
+    p.add_argument("--dry-run", action="store_true", help="Mostrar el plan de --add-skills sin escribir archivos.")
     p.add_argument("--prefetch", action="store_true", help="Descargar todas las fuentes del catálogo a la caché para uso offline posterior.")
     p.add_argument("--cache", type=Path, default=cache_dir(), help="Caché de blobs verificados.")
     args = p.parse_args()
@@ -128,6 +142,13 @@ def main():
         if args.check_updates:
             return
         if not project.is_dir(): raise ConfigError("La carpeta del proyecto debe existir.")
+        if args.dry_run and not args.add_skills: raise ConfigError("--dry-run requiere --add-skills.")
+        if args.add_skills:
+            if args.apply or args.preview or args.ui or args.doctor or args.prefetch or args.ux_search is not None:
+                raise ConfigError("--add-skills no se combina con otras operaciones.")
+            result = preview_additions(args.add_skills, project) if args.dry_run else install_additions(args.add_skills, project, args.cache, lambda message: print(message, file=sys.stderr))
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return
         if args.ux_search is not None:
             from tooling import ux_search
             ux_search(project, args.ux_search)

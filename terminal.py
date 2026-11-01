@@ -3,7 +3,7 @@ import copy
 from pathlib import Path
 
 from catalog import AGENTS, PACKS, roles_for
-from engine import ConfigError, detect_stack, initialize, preview
+from engine import ConfigError, detect_stack, initialize, preview, installation, preview_additions, install_additions
 from runtime import VERSION, project_defaults
 
 class Cancelled(Exception):
@@ -76,6 +76,28 @@ def collect(project, prompts, base=None):
         c["parallel"] = prompts.ask("confirm", "¿Permitir subagentes en tareas independientes?", default=c["parallel"])
     return c
 
+def run_additions(project, cache, prompts, state):
+    print(f"Instalación detectada: {len(state['installed'])} skills. Se conserva la configuración existente.")
+    if not state["available"]:
+        print("No hay skills nuevas disponibles para este proyecto.")
+        return None
+    from catalog import ROLES
+    choices = [(name, "ca-" + name + " · " + ROLES[name][3]) for name in state["available"]]
+    selected = prompts.ask("multi", "Skills disponibles para agregar (solo faltantes)", choices, [])
+    if not selected:
+        print("No se seleccionaron skills nuevas. No se modificó el proyecto.")
+        return None
+    plan = preview_additions(selected, project)
+    print("\nSkills nuevas:", ", ".join("ca-" + name for name in plan["roles"]))
+    for warning in plan["warnings"]: print("  ·", warning)
+    if plan["conflicts"]: raise ConfigError("Hay archivos en conflicto: " + ", ".join(plan["conflicts"]))
+    if not prompts.ask("confirm", "¿Agregar únicamente estas skills?", default=False):
+        print("Cancelado. No se modificó el proyecto.")
+        return None
+    result = install_additions(selected, project, cache, print, expected_hash=plan["config_hash"])
+    print(result["next"])
+    return result
+
 def run(project, cache=None, prompts=None):
     prompts = prompts or Prompts()
     print(f"\nCreateApp {VERSION} · Configurar un proyecto existente")
@@ -84,6 +106,8 @@ def run(project, cache=None, prompts=None):
     project = Path(project).resolve()
     print("Proyecto:", project)
     try:
+        state = installation(project)
+        if state is not None: return run_additions(project, cache, prompts, state)
         c = collect(project, prompts)
         p = preview(c, project)
         print("\nVista previa")

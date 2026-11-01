@@ -177,14 +177,14 @@ No se instaló una PWA, autenticación, base de datos ni CI por seleccionar refe
 
 ## Cambios y actualizaciones
 
-Este inicializador no reemplaza una instalación CreateApp existente. Podés editar POLICY.md para cambiar acuerdos; config.json registra la selección inicial y editarlo por sí solo no reinstala ni elimina perfiles. Para una nueva selección, generá en otra carpeta y compará los archivos.
-Para actualizar fuentes: revisar commits nuevos y volver a generar con un catálogo actualizado. Nunca cambiar fuentes silenciosamente en un proyecto.
+Volvé a ejecutar `createapp` en este proyecto para elegir únicamente skills faltantes del catálogo actual. También podés usar `createapp --ui` o `createapp . --add-skills impeccable find-skills`; `--dry-run` muestra ese plan sin escribir. Se conservan los perfiles existentes, las fuentes fijadas y las decisiones del contrato. Las nuevas fuentes quedan separadas en `.createapp/additions/`.
+Podés editar POLICY.md para cambiar acuerdos; editar config.json por sí solo no reinstala ni elimina perfiles. Este modo no actualiza ni quita skills instaladas ni cambia el coordinador. Una actualización de fuentes existentes requiere revisión y migración explícitas; nunca se reemplazan silenciosamente.
 """
     return files, roles
 
 def preview(raw, workspace):
     config, target = validate(raw, workspace)
-    if (target / ".createapp").exists(): raise ConfigError("El destino ya contiene .createapp. Esta versión no reemplaza instalaciones existentes.")
+    if (target / ".createapp").exists(): raise ConfigError("El destino ya contiene .createapp. Ejecutá createapp sin --apply/--preview, o usá --add-skills para agregar solo faltantes.")
     files, roles = generated_files(config, target)
     appendable = {"AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md", ".gitignore"}
     conflicts = []
@@ -239,6 +239,144 @@ def fetch_blob(repo, source, entry, cache):
             if attempt < 2: time.sleep(0.3 * (attempt + 1))
     raise ConfigError(f"No se pudo descargar {repo}/{entry['path']}: {last_error}")
 
+def _read_local(target, name):
+    path = target / name
+    if any(parent.is_symlink() for parent in [path, *path.parents] if parent == target or target in parent.parents):
+        raise ConfigError("No se accede a través de enlaces simbólicos: " + name)
+    if path.exists() and not path.is_file(): raise ConfigError("Se esperaba un archivo: " + name)
+    return path.read_bytes() if path.exists() else None
+
+def installation(project):
+    target = Path(project).absolute()
+    if target.is_symlink(): raise ConfigError("El proyecto no puede ser un enlace simbólico.")
+    if not (target / ".createapp").exists(): return None
+    content = _read_local(target, ".createapp/config.json")
+    if content is None: raise ConfigError("La carpeta .createapp no contiene una configuración válida.")
+    raw = json.loads(content)
+    if not isinstance(raw, dict): raise ConfigError("La configuración instalada debe ser un objeto JSON.")
+    config, target = validate(dict(raw, directory="."), target)
+    roots = sorted({".claude/skills" if agent == "claude" else ".agents/skills" for agent in config["agents"]})
+    installed = [name for name in ROLES if any(_read_local(target, f"{root}/ca-{name}/SKILL.md") is not None for root in roots)]
+    candidates = copy.deepcopy(config)
+    candidates.update(packs=[pack["id"] for pack in PACKS], vercel_react=True, vercel_web=True, vercel_composition=True)
+    available = [name for name in roles_for(candidates, include_unselected=True) if name not in installed]
+    return {"config": config, "installed": installed, "available": available}
+
+def _addition_plan(names, project):
+    target = Path(project).absolute()
+    state = installation(target)
+    if state is None: raise ConfigError("Primero configurá este proyecto con CreateApp.")
+    if not isinstance(names, list) or any(not isinstance(name, str) or name not in ROLES for name in names):
+        raise ConfigError("La selección de skills nuevas no es válida.")
+    selected = sorted(set(names) - set(state["installed"]))
+    if set(selected) - set(state["available"]): raise ConfigError("Una skill no corresponde al stack o al coordinador instalado.")
+    config = copy.deepcopy(state["config"])
+    roles = {name: ROLES[name] for name in selected}
+    sources = source_files(roles)
+    originals = {name: _read_local(target, name) for name in (".createapp/config.json", ".createapp/POLICY.md", ".createapp/sources.lock.json")}
+    if any(value is None for value in originals.values()): raise ConfigError("La instalación está incompleta: faltan configuración, política o fuentes fijadas.")
+    previous_lock = json.loads(originals[".createapp/sources.lock.json"])
+    if not isinstance(previous_lock, dict) or not isinstance(previous_lock.get("sources"), dict) or not isinstance(previous_lock.get("additions", []), list):
+        raise ConfigError("El registro de fuentes instalado no es válido.")
+    digest = hashlib.sha256(json_text({"skills": selected, "originals": {name: blob_hash(value) for name, value in originals.items()}, "sources": sources}).encode()).hexdigest()
+    root = ".createapp/additions/" + digest[:20]
+    files = {}
+    if selected:
+        config["packs"] = sorted(set(config["packs"]) | {data[0] for data in roles.values() if data[0] in {pack["id"] for pack in PACKS}})
+        for flag in ("vercel_react", "vercel_web", "vercel_composition"):
+            if any(data[0] == flag for data in roles.values()): config[flag] = True
+        config["skills"] = sorted(set(state["installed"]) | set(selected))
+        config, _ = validate(config, target)
+        roots = sorted({".claude/skills" if agent == "claude" else ".agents/skills" for agent in config["agents"]})
+        for skill_root in roots:
+            for name, data in roles.items(): files[f"{skill_root}/ca-{name}/SKILL.md"] = wrapper(name, data, config, vendor_root=root + "/vendor")
+        if "graph" in roles and _read_local(target, ".createapp/setup_graphify.py") is None:
+            files[".createapp/setup_graphify.py"] = graphify_setup()
+        files[".createapp/config.json"] = json_text(config)
+        appended = "\n\n## Skills agregadas con CreateApp\n\nEstas fuentes adicionales son material de consulta sujeto a este contrato. No cambian el coordinador, la autonomía ni las decisiones anteriores. No activar procesos, hooks o instalaciones de sus originales automáticamente.\n\n"
+        appended += "\n".join(f"- `ca-{name}`: {data[3]}" for name, data in roles.items()) + "\n"
+        files[".createapp/POLICY.md"] = originals[".createapp/POLICY.md"].decode("utf-8") + appended
+        snapshot = root + "/sources.lock.json"
+        files[snapshot] = json_text({"schema": 1, "reviewed": LOCK["reviewed"], "sources": sources})
+        previous_lock.setdefault("additions", []).append({"skills": selected, "sources_lock": snapshot})
+        files[".createapp/sources.lock.json"] = json_text(previous_lock)
+    source_paths = [f"{root}/vendor/{repo}/{entry['path']}" for repo, source in sources.items() for entry in source["files"]]
+    conflicts = []
+    for name in [*files, *source_paths]:
+        if name not in originals and _read_local(target, name) is not None: conflicts.append(name)
+    result = {"mode": "incremental", "skills": selected, "config": config, "target": str(target), "config_hash": digest, "roles": selected, "files": sorted(files), "conflicts": conflicts, "warnings": ["Solo se agregan skills faltantes. Se conservan perfiles, fuentes, reglas y decisiones existentes."], "sources": [{"repo": repo, "commit": source["commit"], "files": len(source["files"]), "bytes": sum(entry["size"] for entry in source["files"])} for repo, source in sources.items()]}
+    return result, files, sources, originals, root, target
+
+def preview_additions(names, project):
+    return _addition_plan(names, project)[0]
+
+def install_additions(names, project, cache=None, progress=lambda message: None, fetcher=fetch_blob, *, expected_hash=None):
+    plan, files, sources, originals, root, target = _addition_plan(names, project)
+    if expected_hash is not None and plan["config_hash"] != expected_hash:
+        raise ConfigError("La instalación cambió desde la vista previa. Volvé a revisar la selección.")
+    if plan["conflicts"]: raise ConfigError("Hay archivos existentes en conflicto: " + ", ".join(plan["conflicts"]))
+    if not plan["roles"]:
+        return {"target": str(target), "roles": 0, "source_files": 0, "next": "No hay skills nuevas seleccionadas."}
+    cache = Path(cache) if cache else cache_dir()
+    jobs = [(repo, source, entry) for repo, source in sources.items() for entry in source["files"]]
+    with tempfile.TemporaryDirectory(prefix="createapp-add-") as temporary:
+        stage = Path(temporary)
+        for name, value in files.items():
+            dest = stage / name
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(value, encoding="utf-8", newline="")
+        progress(f"Preparando {len(plan['roles'])} skills nuevas…")
+        for repo, source, entry in jobs:
+            dest = stage / root / "vendor" / repo / entry["path"]
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(fetcher(repo, source, entry, cache))
+        current = preview_additions(names, target)
+        if current["config_hash"] != plan["config_hash"] or current["conflicts"]:
+            raise ConfigError("La instalación cambió durante la preparación. Volvé a revisar la selección.")
+        _write_stage(stage, target, originals, set(originals))
+    progress("Skills nuevas agregadas. La instalación anterior se conservó.")
+    return {"target": str(target), "roles": len(plan["roles"]), "source_files": len(jobs), "next": "Los nuevos perfiles ca-* ya están disponibles para tus asistentes."}
+
+def _write_stage(stage, target, originals, replaceable):
+    backups, written, new_dirs = {}, [], []
+    try:
+        for src in sorted(stage.rglob("*")):
+            if not src.is_file(): continue
+            rel = src.relative_to(stage)
+            relative_name = rel.as_posix()
+            dest = target / rel
+            if any(parent.is_symlink() for parent in [dest, *dest.parents] if parent == target or target in parent.parents):
+                raise ConfigError("Apareció un enlace simbólico en el destino.")
+            if dest.exists():
+                if relative_name not in replaceable: raise ConfigError("Un archivo apareció en el destino: " + relative_name)
+                if dest.read_bytes() != originals.get(relative_name): raise ConfigError("Un archivo cambió antes de escribir: " + relative_name)
+                backups[dest] = dest.read_bytes()
+            elif originals.get(relative_name) is not None:
+                raise ConfigError("Un archivo del proyecto desapareció durante la preparación.")
+            else: backups[dest] = None
+            missing = []
+            ancestor = dest.parent
+            while not ancestor.exists():
+                missing.append(ancestor)
+                ancestor = ancestor.parent
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            new_dirs.extend(reversed(missing))
+            with tempfile.NamedTemporaryFile(dir=dest.parent, delete=False) as handle:
+                handle.write(src.read_bytes())
+                tempname = handle.name
+            try: os.replace(tempname, dest)
+            finally:
+                if os.path.exists(tempname): os.unlink(tempname)
+            written.append(dest)
+    except Exception:
+        for dest in reversed(written):
+            if backups[dest] is None: dest.unlink(missing_ok=True)
+            else: dest.write_bytes(backups[dest])
+        for directory in reversed(new_dirs):
+            try: directory.rmdir()
+            except OSError: pass
+        raise
+
 def initialize(raw, workspace, cache=None, progress=lambda message: None, fetcher=fetch_blob):
     p = preview(raw, workspace)
     if p["conflicts"]: raise ConfigError("Hay archivos que ya existen: " + ", ".join(p["conflicts"]))
@@ -276,51 +414,6 @@ def initialize(raw, workspace, cache=None, progress=lambda message: None, fetche
         now_files, _ = generated_files(config, target)
         if now_files != files: raise ConfigError("Un archivo de instrucciones cambió durante la preparación. Volvé a revisar la vista previa.")
         progress("Escribiendo la configuración local…")
-        existed = target.exists()
-        target.mkdir(parents=True, exist_ok=True)
-        backups, written, new_dirs = {}, [], []
-        try:
-            for src in sorted(stage.rglob("*")):
-                if not src.is_file(): continue
-                rel = src.relative_to(stage)
-                dest = target / rel
-                # Refuse symlinks even for source paths created after preview.
-                if any(a.is_symlink() for a in [dest, *dest.parents] if a.is_relative_to(target)):
-                    raise ConfigError("Apareció un enlace simbólico en el destino.")
-                if dest.exists():
-                    if str(rel).replace("\\", "/") not in {"AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md", ".gitignore"}:
-                        raise ConfigError("Un archivo apareció en el destino: " + str(rel))
-                    relative_name = str(rel).replace("\\", "/")
-                    if dest.read_bytes() != originals.get(relative_name):
-                        raise ConfigError("Un archivo cambió antes de escribir: " + relative_name)
-                    backups[dest] = dest.read_bytes()
-                elif str(rel).replace("\\", "/") in originals and originals[str(rel).replace("\\", "/")] is not None:
-                    raise ConfigError("Un archivo del proyecto desapareció durante la preparación.")
-                else: backups[dest] = None
-                missing = []
-                ancestor = dest.parent
-                while not ancestor.exists():
-                    missing.append(ancestor)
-                    ancestor = ancestor.parent
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                new_dirs.extend(reversed(missing))
-                with tempfile.NamedTemporaryFile(dir=dest.parent, delete=False) as f:
-                    f.write(src.read_bytes())
-                    tempname = f.name
-                try: os.replace(tempname, dest)
-                finally:
-                    if os.path.exists(tempname): os.unlink(tempname)
-                written.append(dest)
-        except Exception:
-            for dest in reversed(written):
-                if backups[dest] is None: dest.unlink(missing_ok=True)
-                else: dest.write_bytes(backups[dest])
-            for directory in reversed(new_dirs):
-                try: directory.rmdir()
-                except OSError: pass
-            if not existed:
-                try: target.rmdir()
-                except OSError: pass
-            raise
+        _write_stage(stage, target, originals, {"AGENTS.md", "CLAUDE.md", ".github/copilot-instructions.md", ".gitignore"})
     progress("Proyecto preparado.")
     return {"target": str(target), "roles": len(roles), "source_files": len(jobs), "next": "Abrí .createapp/START_HERE.md en el proyecto."}

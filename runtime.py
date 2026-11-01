@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import sys
 
-VERSION = "0.2.1"
+VERSION = "0.2.2"
 DATA = Path(__file__).resolve().parent
 
 def cache_dir():

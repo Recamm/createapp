@@ -21,6 +21,7 @@ async function api(path, body) {
 }
 
 function values() {
+  if (catalog.installation) return {skills: [...form.querySelectorAll('[name=add_skill]:checked')].map(input=>input.value)};
   const data = new FormData(form);
   const config = {...defaults};
   for (const key of Object.keys(defaults)) {
@@ -81,7 +82,7 @@ async function preview() {
   const button = $('preview-button');
   button.disabled = true;
   try {
-    const p = await api('/api/preview', values());
+    const p = await api(catalog.installation ? '/api/additions/preview' : '/api/preview', values());
     lastPreview = p;
     $('review-target').textContent = p.target;
     $('review-notices').replaceChildren();
@@ -100,8 +101,9 @@ async function preview() {
     }
     const size = p.sources.reduce((n,s)=>n+s.bytes,0);
     $('review-total').textContent = `${p.roles.length} perfiles · ${(size/1024/1024).toFixed(1)} MB de fuentes`;
-    $('create-button').disabled = p.conflicts.length > 0;
-    $('create-button').textContent = 'Aplicar configuración';
+    $('create-button').disabled = p.conflicts.length > 0 || (catalog.installation && p.roles.length === 0);
+    $('create-button').textContent = catalog.installation ? 'Agregar skills seleccionadas' : 'Aplicar configuración';
+    document.querySelector('#review h2').textContent = catalog.installation ? 'Skills que se agregarán.' : 'Así queda tu configuración.';
     reveal('review');
   } catch (e) {showError(e.message);} finally {button.disabled = false;}
 }
@@ -116,7 +118,7 @@ async function poll() {
       $('progress-title').textContent = 'Tu proyecto está preparado.';
       $('progress-message').textContent = s.result.target;
       $('success-next').hidden = false;
-      $('another-button').textContent = 'Configurar otro proyecto';
+      $('another-button').textContent = 'Ver skills disponibles';
     } else if (s.state === 'error') {
       $('progress-title').textContent = 'No se pudo completar.';
       $('progress-message').textContent = s.error;
@@ -134,9 +136,11 @@ async function create() {
   if (!lastPreview) return;
   $('create-button').disabled = true;
   try {
-    await api('/api/initialize', {config:lastPreview.config, config_hash:lastPreview.config_hash});
+    const incremental = catalog.installation !== null && catalog.installation !== undefined;
+    await api(incremental ? '/api/additions/initialize' : '/api/initialize', {...(incremental ? {skills:lastPreview.skills} : {config:lastPreview.config}), config_hash:lastPreview.config_hash});
     $('success-next').hidden = true;
     $('success-next').querySelector('p').innerHTML = 'Leé <strong>.createapp/START_HERE.md</strong> en la carpeta del proyecto. Ahí tenés los comandos y el mensaje para empezar con tu asistente.';
+    if (incremental) $('success-next').querySelector('p').textContent = 'Las skills seleccionadas ya están disponibles para los asistentes del proyecto. Se conservaron los perfiles y las decisiones anteriores.';
     $('progress-title').textContent = 'Las piezas, en su lugar.';
     $('progress-log').textContent = '';
     reveal('progress');
@@ -179,9 +183,56 @@ function syncIndividualSkills(c) {
   }
 }
 
+function bindActions() {
+  form.addEventListener('submit',event=>{event.preventDefault();preview();});
+  $('preview-button').addEventListener('click',preview);
+  $('create-button').addEventListener('click',create);
+  $('edit-button').addEventListener('click',()=>reveal('layout'));
+  $('another-button').addEventListener('click',()=>{clearTimeout(timer);location.reload();});
+}
+
+async function bootAdditions() {
+  const state = catalog.installation;
+  document.querySelector('.intro').hidden = true;
+  for (const id of ['project','skills','rules']) {
+    $(id).hidden = true;
+    for (const field of $(id).querySelectorAll('input,select,textarea')) field.disabled = true;
+  }
+  $('additions').hidden = false;
+  $('installation-summary').textContent = `${state.installed.length} skills instaladas · ${state.available.length} disponibles`;
+  for (const name of state.available) {
+    const label=document.createElement('label');label.className='check-line';
+    const input=document.createElement('input');input.type='checkbox';input.name='add_skill';input.value=name;
+    const span=document.createElement('span'),strong=document.createElement('strong'),small=document.createElement('small');
+    strong.textContent='ca-'+name;small.textContent=catalog.skills[name].description;
+    span.append(strong,small);label.append(input,span);$('available-skills').append(label);
+  }
+  $('additions-empty').hidden = state.available.length > 0;
+  $('summary-name').textContent = defaults.name;
+  $('summary-stack').textContent = defaults.stack;
+  $('summary-agent').textContent = defaults.agents.map(agent=>catalog.agents[agent]).join(', ');
+  $('summary-coordinator').textContent = defaults.coordinator;
+  $('summary-tests').textContent = defaults.testing === 'strict' ? 'TDD estricto' : 'Proporcionales';
+  $('summary-packs').closest('div').querySelector('dt').textContent = 'Skills nuevas';
+  document.querySelector('.responsibilities').hidden = true;
+  $('export-button').hidden = true;
+  $('preview-button').textContent = 'Revisar skills';
+  const refresh = () => {
+    const count=values().skills.length;
+    $('summary-packs').textContent=`${count} seleccionadas`;
+    $('preview-button').disabled=count === 0;
+    lastPreview=null;
+  };
+  form.addEventListener('change',refresh);
+  bindActions();refresh();$('layout').hidden=false;
+  const status=await api('/api/status');
+  if (status.state === 'running') {reveal('progress');await poll();}
+}
+
 async function boot() {
   try {
     catalog = await api('/api/catalog');defaults = catalog.defaults;
+    if (catalog.installation) {await bootAdditions();return;}
     for (const [value, text] of Object.entries(catalog.agents)) {
       const option = document.createElement('option');option.value=value;option.textContent=text;form.elements.agent.append(option);
     }
@@ -215,11 +266,7 @@ async function boot() {
       if (form.elements.directory.value===previousName) form.elements.directory.value=form.elements.name.value;
       previousName=form.elements.name.value;
     });
-    form.addEventListener('submit',e=>{e.preventDefault();preview();});
-    $('preview-button').addEventListener('click',preview);
-    $('create-button').addEventListener('click',create);
-    $('edit-button').addEventListener('click',()=>reveal('layout'));
-    $('another-button').addEventListener('click',()=>{clearTimeout(timer);reveal('layout');});
+    bindActions();
     $('export-button').addEventListener('click',()=>{
       if (!form.reportValidity()) return;
       const blob=new Blob([JSON.stringify(values(),null,2)+'\n'],{type:'application/json'}), url=URL.createObjectURL(blob), link=document.createElement('a');
