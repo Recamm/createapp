@@ -17,7 +17,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from runtime import VERSION
-from catalog import DEFAULTS
+from catalog import DEFAULTS, PACKS, roles_for
 
 def native_target():
     system = {'Linux': 'linux', 'Darwin': 'macos', 'Windows': 'windows'}.get(platform.system())
@@ -37,13 +37,15 @@ def main():
         temp = Path(temp)
         subprocess.run([sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean', '--distpath', str(temp / 'dist'), '--workpath', str(temp / 'build'), str(ROOT / 'CreateApp.spec')], cwd=ROOT, check=True)
         binary = temp / 'dist' / ('createapp.exe' if os.name == 'nt' else 'createapp')
-        subprocess.run([str(binary), '--version'], check=True)
+        version = subprocess.check_output([str(binary), '--version'], text=True).strip()
+        assert version == f'CreateApp {VERSION}', version
+        print(version)
         project = temp / 'project'
         project.mkdir()
         original = project / 'app.txt'
         original.write_text('existing project', encoding='utf-8')
         cfg = temp / 'config.json'
-        cfg.write_text(json.dumps(DEFAULTS), encoding='utf-8')
+        cfg.write_text(json.dumps(dict(DEFAULTS, packs=[pack['id'] for pack in PACKS])), encoding='utf-8')
         # Empty PATH verifies that neither Python nor Node executables are launched.
         empty_path = temp / 'empty-path'
         empty_path.mkdir()
@@ -53,6 +55,12 @@ def main():
         assert not (project / 'package.json').exists()
         assert (project / '.createapp/POLICY.md').is_file()
         assert not (project / 'START_HERE.md').exists()
+        installed_config = json.loads((project / '.createapp/config.json').read_text(encoding='utf-8'))
+        assert set(installed_config['packs']) == {pack['id'] for pack in PACKS}
+        for name, (_, repo, paths, _) in roles_for(installed_config).items():
+            assert (project / f'.agents/skills/ca-{name}/SKILL.md').is_file(), name
+            for path in paths:
+                assert (project / '.createapp/vendor' / repo / path).is_file(), (repo, path)
         subprocess.run([str(binary), str(project), '--ux-search', 'minimal productivity', '--design-system', '-f', 'markdown'], env=env, stdout=subprocess.DEVNULL, check=True)
         subprocess.run([str(binary), str(project), '--doctor'], env=env, check=True)
         content = temp / 'package'

@@ -10,6 +10,8 @@ GitHub Actions ejecuta pruebas y builds nativos para Windows x64, Linux x64/ARM6
 
 Los comandos de descarga siguientes **requieren una release pública publicada**. Un borrador todavía no habilita las descargas públicas. Las releases existentes nunca se reemplazan automáticamente.
 
+Reinstalar descarga la última release publicada, no el código de `main`. Para distribuir un catálogo nuevo hay que incrementar `runtime.VERSION`, esperar los builds y publicar el nuevo borrador. Si la versión no cambia, reinstalar vuelve a descargar el binario anterior aunque el repositorio ya contenga nuevas skills.
+
 ## Instalación con un comando
 
 Windows x64, desde PowerShell dentro de tu proyecto:

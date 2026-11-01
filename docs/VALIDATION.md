@@ -1,4 +1,21 @@
-# Validación de CreateApp 0.2.0
+# Validación de CreateApp
+
+## 0.2.1: verificación local en Windows
+
+Fecha: 1 de noviembre de 2026.
+
+- 53 pruebas ejecutadas: 50 aprobadas y 3 omitidas (enlaces simbólicos no disponibles y dos pruebas del instalador POSIX).
+- Compilación nativa Windows x64 con PyInstaller 6.22.3 y Python 3.11.9, en un entorno de build aislado.
+- El ejecutable debe responder con la versión exacta del código y generar todos los paquetes del catálogo. La comprobación de build verifica los perfiles ca-* y sus referencias originales, incluidos Impeccable y Find Skills.
+- Ejecución del binario con PATH vacío: generación de 15 perfiles y 299 fuentes, diagnóstico y buscador UI/UX. No requiere Python ni Node externos.
+- Reproducción del problema de distribución: la instalación pública 0.2.0 solo contenía siete paquetes. Reinstalar esa misma release no incorporaba los cambios de main.
+- Instalación local de 0.2.1 a partir del archivo Windows verificado por SHA-256, preservando el ejecutable anterior. El comando instalado abre el menú interactivo.
+- Interfaz del ejecutable instalado: nueve paquetes disponibles; Impeccable y Find Skills son opcionales y ambos perfiles aparecen en la vista previa al seleccionarlos, sin aplicar cambios al repositorio.
+- Corrección de la validación HTML del nombre para navegadores con expresiones regulares en modo Unicode v; acepta nombres con guiones y rechaza caracteres fuera del formato admitido.
+
+Pendiente para distribuir esta versión: subir los cambios, ejecutar los cinco builds y publicar la release 0.2.1. El paquete local no reemplaza la release pública. El reemplazo mediante el actualizador interactivo se cubrió con mocks, no con una actualización automática real; los demás sistemas requieren sus runners nativos.
+
+## 0.2.0: registro histórico
 
 Fecha: 24 de octubre de 2026.
 
